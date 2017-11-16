@@ -2,7 +2,7 @@
 
 ### Major Changes
  - Removed all dependencies that point back to Robo3D GITHUB
- - Renamed the plugin\
+ - Renamed the plugin
 
 # Change Log 1.10.0
 
