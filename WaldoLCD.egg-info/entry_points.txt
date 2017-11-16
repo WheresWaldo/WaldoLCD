@@ -1,0 +1,3 @@
+[octoprint.plugin]
+WaldoLCD = WaldoLCD
+
