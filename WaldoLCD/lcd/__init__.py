@@ -44,7 +44,7 @@ def start():
   from z_offset_wizard import ZoffsetWizard
   from scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Waldo_Icons
   from netconnectd import NetconnectdClient
-  from WaldoLCD import printer
+  from WaldoLCD import waldoprinter
   from kivy.logger import Logger
   import thread
   from kivy.core.window import Window

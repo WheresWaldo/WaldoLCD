@@ -18,7 +18,7 @@ class ZoffsetWizard(object):
         super(ZoffsetWizard, self).__init__()
         self.sm = waldosm
         self.name = 'zoffset' #name of initial screen
-        self.z_pos_init = 20.00
+        self.z_pos_init = 10.00
         self.z_pos_end = 0.0
         self.first_screen(back_destination=back_destination)
 
@@ -154,7 +154,7 @@ class ZoffsetWizard(object):
         bed_y = 0
 
         waldoprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F10000')
-        waldoprinter.printer_instance._printer.commands('G1 Z20 F1500')
+        waldoprinter.printer_instance._printer.commands('G1 Z10 F1500')
 
     def position_callback(self, dt):
         temps = waldoprinter.printer_instance._printer.get_current_temperatures()
