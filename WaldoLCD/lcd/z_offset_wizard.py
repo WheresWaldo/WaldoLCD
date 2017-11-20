@@ -142,7 +142,7 @@ class ZoffsetWizard(object):
     def _prepare_printer(self):
         # Prepare printer for zoffset configuration
         #jog the Z Axis Down to prevent any bed interference
-        jogger = {'z': 160}
+        jogger = {'z': 10}
         printer_jog.jog(desired=jogger, speed=1500, relative=True)
         #kill the extruder
         waldoprinter.printer_instance._printer.commands('M104 S0')
