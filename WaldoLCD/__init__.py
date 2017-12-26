@@ -176,7 +176,7 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
 
     def get_update_information(self):
         return dict(
-            robolcd=dict(
+            waldolcd=dict(
                 displayName="WaldoLCD",
                 displayVersion=self._plugin_version,
 

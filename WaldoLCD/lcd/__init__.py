@@ -343,7 +343,7 @@ def start():
           mode = waldoprinter.lang.pack['WiFi']['WiFi']
           ip = waldoprinter.lang.pack['WiFi']['WiFi']
           hostname = waldoprinter.lang.pack['WiFi']['WiFi']
-          Logger.error('RoboScreenManager.generate_ip_screen: {}'.format(e))
+          Logger.error('WaldoScreenManager.generate_ip_screen: {}'.format(e))
         t = waldoprinter.lang.pack['WiFi']['Connection_Status'] + ' \n    {}\n\n '.format(mode) + waldoprinter.lang.pack['WiFi']['IP'] + ' \n    {}\n\n '.format(ip) + waldoprinter.lang.pack['WiFi']['Hostname'] +' \n    {}'.format(hostname)
         c.text = t
         return
@@ -362,7 +362,7 @@ def start():
       else:
         back_d = 'main'
       # pass control of wifi configuration sequences to WifiConfiguration
-      WifiConfiguration(roboscreenmanager=self, back_destination=back_d)
+      WifiConfiguration(waldoscreenmanager=self, back_destination=back_d)
 
 
 
@@ -460,7 +460,7 @@ def start():
       
 
     def generate_zaxis_wizard(self, **kwargs):
-      ZoffsetWizard(robosm=self, back_destination=kwargs['back_destination'])
+      ZoffsetWizard(waldosm=self, back_destination=kwargs['back_destination'])
 
     def generate_motor_controls(self, **kwargs):
       name = kwargs['name']
@@ -687,7 +687,7 @@ def start():
   
           elif popup == "ERROR":
             Logger.info("Showing Error")
-            ep = Error_Popup(acceptable_options[option]['error'], acceptable_options[option]['body_text'],callback=partial(waldoprinter.robosm.go_back_to_main, tab='printer_status_tab'))
+            ep = Error_Popup(acceptable_options[option]['error'], acceptable_options[option]['body_text'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab'))
             ep.show()
   
           Logger.info("Executing: " + acceptable_options[option]['command'])
@@ -709,7 +709,7 @@ def start():
                                             back_function)
 
           #make screen
-          waldoprinter.robosm._generate_backbutton_screen(name='view_preheat', 
+          waldoprinter.waldosm._generate_backbutton_screen(name='view_preheat', 
                                                        title = acceptable_options[option]['Title'] , 
                                                        back_destination=back_screen, 
                                                        content=content
@@ -734,7 +734,7 @@ def start():
     
       
       waldoprinter.printer_instance._printer.commands('M18')
-      ep = Error_Popup(waldoprinter.lang.pack['Popup']['Motors_Title'], waldoprinter.lang.pack['Popup']['Motors_Body'],callback=partial(waldoprinter.robosm.go_back_to_main, tab='printer_status_tab'))
+      ep = Error_Popup(waldoprinter.lang.pack['Popup']['Motors_Title'], waldoprinter.lang.pack['Popup']['Motors_Body'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab'))
       ep.show()
 
     def mainboard_status(self, **kwargs):
@@ -757,7 +757,7 @@ def start():
                                         go_back)
 
       #make screen
-      waldoprinter.robosm._generate_backbutton_screen(name='refresh_confirmation', 
+      waldoprinter.waldosm._generate_backbutton_screen(name='refresh_confirmation', 
                                                    title = waldoprinter.lang.pack['Error_Detection']['MAINBOARD']['Reset_Confirmation']['Title'] , 
                                                    back_destination=back_screen, 
                                                    content=content
@@ -785,12 +785,12 @@ def start():
         return False
 
 
-  class RoboLcdApp(App):
+  class WaldoLcdApp(App):
 
     def build(self):
-      # Root widget is RoboScreenManager
+      # Root widget is WaldoScreenManager
       dir_path = os.path.dirname(os.path.realpath(__file__))
-      resource_add_path(dir_path) #kivy will look for images and .kv files in this directory path/to/RoboLCD/lcd/
+      resource_add_path(dir_path) #kivy will look for images and .kv files in this directory path/to/WaldoLCD/lcd/
       printer_info = waldoprinter.printer_instance._printer.get_current_connection()
       sm = None
       # Determine what kivy rules to implement based on screen size desired. Will use printerprofile to determine screen size
@@ -871,8 +871,8 @@ def start():
       Logger.info('Screen Type: {}'.format('R2'))
       return sm
 
-  RoboLCD = RoboLcdApp()
-  RoboLCD.run()
+  WaldoLCD = WaldoLcdApp()
+  WaldoLCD.run()
   
 
   

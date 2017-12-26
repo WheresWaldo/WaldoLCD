@@ -17,7 +17,7 @@ class Install_Deps(object):
                       "https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip",
                      ])
         if r is not 0:
-            print("Could not install RoboLCD dependencies: OctoPrint_FirmwareUpdater")
+            print("Could not install WaldoLCD dependencies: OctoPrint_FirmwareUpdater")
             sys.exit(-1)
         else:
             pass

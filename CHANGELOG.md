@@ -1,4 +1,4 @@
-# RoboLCD Changelog
+# WaldoLCD Changelog
 
 ## 1.10.1.A
 
@@ -75,7 +75,7 @@
 
 ### Bug Fixes
 
-* Installation of RoboLCD does not ignore the new onboard webcam option created in 1.8.0.
+* Installation of WaldoLCD does not ignore the new onboard webcam option created in 1.8.0.
 
 ## 1.8.0 (2017-6-9)
 
@@ -242,7 +242,7 @@
 
 ###Improvements
 
-* Utilities-->Update is aware of any RoboOS updates without the need to upgrade RoboLCD source code
+* Utilities-->Update is aware of any WaldoOS updates without the need to upgrade WaldoLCD source code
 
 ##1.2.2 (2017-1-4)
 
@@ -386,7 +386,7 @@
 
 ### Bug Fixes
 
-* Kivy app dynamicaly becomes aware of /path/to/RoboLCD/lcd/ . Fixes issue of hardcoded directory paths for custom .kv and Icons files, and kivy app's inability to find these files on different installation paths.
+* Kivy app dynamically becomes aware of /path/to/WaldoLCD/lcd/ . Fixes issue of hard-coded directory paths for custom .kv and Icons files, and kivy app's inability to find these files on different installation paths.
 
 ##0.1.0 (2016-08-05)
 
