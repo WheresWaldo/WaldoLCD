@@ -58,6 +58,8 @@ FS_MOUNTOPTIONS=""
 VERBOSE=no
 EndOfMessage
 
+
+
 USB_DIR="/home/pi/.octoprint/uploads/USB"
 
 if [ -d "$USB_DIR" ]; then

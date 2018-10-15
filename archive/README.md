@@ -4,4 +4,3 @@ The first and current stage of development will be to create a functional kivy t
 TODO:
 	1. Template out the UI
 	2. Add functionality to UI
-	3. Detach from Robo3D GITHUB

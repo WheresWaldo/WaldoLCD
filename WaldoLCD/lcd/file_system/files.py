@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-27 15:58:32
+# @Last Modified by:   Matt Pedler
+# @Last Modified time: 2018-02-22 09:43:44
 #Kivy
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -30,13 +35,13 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from functools import partial
 
-#WaldoLCD
-from WaldoLCD.lcd.pconsole import pconsole
-from WaldoLCD import waldoprinter
-from WaldoLCD.lcd.Language import lang
-from WaldoLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Waldo_Icons, Storage_Icons
-from WaldoLCD.lcd.connection_popup import Zoffset_Warning_Popup, Error_Popup, USB_Progress_Popup
-from WaldoLCD.lcd.session_saver import session_saver
+#RoboLCD
+from RoboLCD.lcd.pconsole import pconsole
+from RoboLCD import roboprinter
+from RoboLCD.lcd.Language import lang
+from RoboLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Robo_Icons, Storage_Icons
+from RoboLCD.lcd.connection_popup import Zoffset_Warning_Popup, Error_Popup, USB_Progress_Popup
+from RoboLCD.lcd.session_saver import session_saver
 from file_explorer import File_Explorer
 from file_options import FileOptions
 from file_overseer import File_Overseer
@@ -68,6 +73,7 @@ class FilesContent(BoxLayout):
 
         #if octoprint has changed files then update them
         session_saver.save_variable('file_callback', self.call_to_update)
+        session_saver.save_variable('usb_status', self.update_usb_status)
         session_saver.save_variable('usb_mounted', False)
 
         #schedule directory observer http://pythonhosted.org/watchdog/api.html#watchdog.events.FileSystemEventHandler
@@ -81,7 +87,7 @@ class FilesContent(BoxLayout):
         self.file_screen = File_Overseer()
         self.USB_files_text = lang.pack['Files']['File_Tab']['USB_Files'] + "\n"
 
-
+        usb_size = None
         if os.path.isdir(USB_DIR):
             if len(os.listdir(USB_DIR)) != 0:
                 self.has_usb_attached = True
@@ -101,6 +107,8 @@ class FilesContent(BoxLayout):
         self.local_button = Storage_Icons('Icons/Files_Icons/File_Options/Local Storage.png', local_files, "LOCAL", callback=self.open_file_system)
         self.usb_button = Storage_Icons('Icons/Files_Icons/File_Options/USB Storage.png', self.USB_files_text, "USB", callback=self.open_file_system)
         #change the state of the USB button
+        
+
         self.usb_button.button_state = not self.has_usb_attached
 
         files = Scroll_Box_Icons([self.local_button, self.usb_button])
@@ -159,25 +167,40 @@ class FilesContent(BoxLayout):
 
         #populate a new screen
         #Logger.info("Opening screen")
-        waldoprinter.waldosm.add_widget(self.screen)
-        waldoprinter.waldosm.current = self.screen.name
+
+        self.screen.delete_same_name_screens()
+        roboprinter.robosm.add_widget(self.screen)
+        roboprinter.robosm.current = self.screen.name
 
     def update_files(self):
         
+        #figure out disk sizes
         disk = self.disk_usage(os.getcwd())
-        local_files = lang.pack['Files']['File_Tab']['Local_Files'] + "\n( " + str(disk[2]) + " / " + str(disk[0]) + " )" 
-        self.local_button.original_icon_name = local_files
-        self.local_button.icon_name = local_files
-
+        disk_size = "( " + str(disk[2]) + " / " + str(disk[0]) + " )"
+        local_files = lang.pack['Files']['File_Tab']['Local_Files'] + "\n" + str(disk_size) 
+        
         if session_saver.saved['usb_mounted']:
             usb_size = self.disk_usage(USB_DIR)
-            self.USB_files_text = "[color=#69B3E7]" + lang.pack['Files']['File_Tab']['USB_Files'] + "[/color]\n( " + str(usb_size[2]) + " / " + str(usb_size[0]) + " )"
-            self.usb_button.original_icon_name = self.USB_files_text
-            self.usb_button.icon_name = self.USB_files_text
+            usb_disk_size ="( " + str(usb_size[2]) + " / " + str(usb_size[0]) + " )"
+            Logger.info("Evaluating disk size")
+            #if the USB_DIR is not a mount point, then there is not a USB available or the USB is a NTFS file system
+            if not os.path.ismount(USB_DIR):
+                Logger.info("USB_DIR is not a mounted path! Putting warning in text!")
+                self.USB_files_text = lang.pack['Files']['File_Tab']['Unmounted_USB']
+                self.usb_button.button_state = True
+            else:
+                Logger.info("USB is a mounted path, making connected text")
+                self.USB_files_text = "[color=#69B3E7]" + lang.pack['Files']['File_Tab']['USB_Files'] + "[/color]\n" + str(usb_disk_size)
         else:
+            Logger.info("USB is not connected Greying out button")
             self.USB_files_text = lang.pack['Files']['File_Tab']['USB_Files'] + "\n"
-            self.usb_button.original_icon_name = self.USB_files_text
-            self.usb_button.icon_name = self.USB_files_text
+
+        #Update USB text
+        self.usb_button.original_icon_name = self.USB_files_text
+        self.usb_button.icon_name = self.USB_files_text
+
+        self.local_button.original_icon_name = local_files
+        self.local_button.icon_name = local_files    
         
 
     #This function is a callback from an observer that is watching /dev for any device changes. Namely the USB being plugged in
@@ -201,13 +224,33 @@ class FilesContent(BoxLayout):
                 self.has_usb_attached = True
                 self.call_to_update()
 
-            #change the state of the USB button
-            self.usb_button.button_state = not self.has_usb_attached
-        # elif extern != None:
-        #     Logger.info(event.src_path)
+            #change the state of the USB button if it is mounted
+            if os.path.ismount(USB_DIR):
+                self.usb_button.button_state = not self.has_usb_attached
+            else:
+                self.usb_button.button_state = True
+
+            #update the socket to tell the rest of the world the USB status.
+            # usb_attached means that the USB is attached, usb mounted means that the usb is readable by the system.
+            usb_dict = {
+                'usb_attached': self.has_usb_attached,
+                'usb_mounted': not self.usb_button.button_state #originally this variable means "is_disabled?" so flip it to make sense to us
+            }
+            roboprinter.printer_instance._plugin_manager.send_plugin_message(roboprinter.printer_instance._identifier, dict(type="usb_status", data=usb_dict))
+    
+
+    def update_usb_status(self):
+        #update the socket to tell the rest of the world the USB status.
+        # usb_attached means that the USB is attached, usb mounted means that the usb is readable by the system.
+        usb_dict = {
+            'usb_attached': self.has_usb_attached,
+            'usb_mounted': not self.usb_button.button_state #originally this variable means "is_disabled?" so flip it to make sense to us
+        }
+
+        return usb_dict
 
 
     #This function uses a shared funtion in the Meta Reader Plugin to collect information from a pipe
     #without disturbing the main thread
     def collect_meta_data(self, dt):
-        waldoprinter.printer_instance.collect_data()
+        roboprinter.printer_instance.collect_data()

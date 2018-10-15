@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler modded by BH
+# @Date:   2017-09-19 11:46:30
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 12:18:21
 from kivy.uix.label import Label
 from kivy.uix.tabbedpanel import TabbedPanelHeader
 from scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Waldo_Icons
@@ -93,4 +98,18 @@ class UtilitiesContent(BoxLayout):
 
 
 class QRCodeScreen(BoxLayout):
-    img_source = waldoprinter.printer_instance.get_plugin_data_folder() + '/qr_code.png'
+    title = StringProperty(waldoprinter.lang.pack['Utilities']['QR_Code'])
+    img_source = StringProperty('')
+    def __init__(self):
+        super(QRCodeScreen, self).__init__() 
+        self.img_source = waldoprinter.printer_instance.get_plugin_data_folder() + '/qr_code.png'
+
+class Access_Control_QR_Code(BoxLayout):
+    body_text = StringProperty(waldoprinter.lang.pack['QR_AC_Code'])
+    img_source = StringProperty("Icons/access_control/no_qr.png")
+    title = StringProperty(waldoprinter.lang.pack['Utilities']['Access_Control'])
+
+    def __init__(self):
+        super(Access_Control_QR_Code, self).__init__() 
+
+            

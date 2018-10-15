@@ -1,10 +1,15 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-27 15:58:32
+# @Last Modified by:   Matt Pedler
+# @Last Modified time: 2018-01-28 15:00:28
 #Kivy
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.logger import Logger
 
-#WaldoLCD
-from WaldoLCD import waldoprinter
+#RoboLCD
+from RoboLCD import roboprinter
 
 
 class File_BB(Screen):
@@ -17,10 +22,12 @@ class File_BB(Screen):
         super(File_BB, self).__init__()
         self.name="File_Explorer"
         self.title = ''
+        self.debug = False
         self.back_function = None
         self.option_function = None
         self.content = None
         self.file_content = self.ids.content_layout
+        self.delete_same_name_screens()
         
     def update_back_function(self, back_function):
         self.back_function = back_function
@@ -81,6 +88,24 @@ class File_BB(Screen):
         if option_function == 'no_option':
             self.option_function = self.placeholder
             self.icon = "Icons/Printer Status/blank-warning.png" #blank
+
+        ####################################### Debug Code################################################
+        # if self.debug:
+
+        #     Logger.info("Listing Children")
+        #     for child in self.file_content.children:
+        #         Logger.info("---> Checking Content for active objects")
+        #         # Print out the instance of this class. The name of the instance and
+        #         # address in memory will be printed.
+        #         Logger.info(str(child))
+        #     Logger.info("Done Listing Children")
+    
+    def delete_same_name_screens(self):
+        for s in roboprinter.robosm.screen_names:
+            if s is self.name:
+                d = roboprinter.robosm.get_screen(s)
+                roboprinter.robosm.remove_widget(d)
+                Logger.info("Removed Duplicate Screen: " + s)
 
 
 

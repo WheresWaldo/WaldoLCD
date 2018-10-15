@@ -11,11 +11,14 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.factory import Factory
 
+
 class StandingHeader(TabbedPanelHeader):
     pass
 
+
 class CloseableHeader(TabbedPanelHeader):
     pass
+
 
 Factory.register('StandingHeader', cls=StandingHeader)
 Factory.register('CloseableHeader', cls=CloseableHeader)
@@ -106,6 +109,7 @@ Builder.load_string('''
                 on_touch_down:
                     if self.collide_point(*args[1].pos) :\
                         root.panel.remove_widget(root)
+
 
 <PanelRight>
     tab_pos: 'top_right'
@@ -248,6 +252,7 @@ Builder.load_string('''
                 keep_ratio: False
 ''')
 
+
 class Tp(TabbedPanel):
 
     #override tab switching method to animate on tab switch
@@ -270,19 +275,24 @@ class Tp(TabbedPanel):
         else:
             _on_complete()
 
+
 class PanelLeft(Tp):
     pass
+
 
 class PanelRight(Tp):
 
     def add_header(self):
         self.add_widget(CloseableHeader(panel=self))
 
+
 class PanelbLeft(Tp):
     pass
 
+
 class PanelbRight(Tp):
     pass
+
 
 class TabShowcase(FloatLayout):
 
@@ -307,6 +317,7 @@ class TabShowcase(FloatLayout):
                 = self.tab3.tab_pos = values[(index + 1) % len(values)]
             self.but.text = 'Tabs in \'%s\' position,' % self.tab.tab_pos\
                 + '\n press to change to next pos'
+
 
 class TestTabApp(App):
 

@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler modded by BH
+# @Date:   2017-07-14 12:42:48
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:12:16
 import subprocess
 from kivy.logger import Logger
 from common_screens import Title_Button_Screen
-from .. import waldoprinter
+from .. import waldboprinter
 from kivy.clock import Clock
 from Language import lang
 
@@ -20,9 +25,9 @@ class webcam():
             pass
         return webcam
     def start(self):
-        subprocess.call(['/home/pi/scripts/webcam start'], shell=True)
+        subprocess.call(['/home/pi/.octoprint/scripts/webcam start'], shell=True)
     def stop(self):
-        subprocess.call(['/home/pi/scripts/webcam stop'], shell=True)
+        subprocess.call(['/home/pi/.octoprint/scripts/webcam stop'], shell=True)
 
 class Camera(Title_Button_Screen):
     #title_text, body_text, button_function, button_text = "OK", **kwargs

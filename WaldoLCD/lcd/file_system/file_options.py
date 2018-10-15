@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-27 17:53:43
+# @Last Modified by:   Matt Pedler
+# @Last Modified time: 2018-01-30 09:26:28
 #kivy
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -12,14 +17,14 @@ from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, Num
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-#WaldoLCD
-from WaldoLCD.lcd.pconsole import pconsole
-from WaldoLCD import waldoprinter
-from WaldoLCD.lcd.Language import lang
-from WaldoLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Even_Button
-from WaldoLCD.lcd.session_saver import session_saver
-from WaldoLCD.lcd.common_screens import KeyboardInput, Modal_Question_No_Title, Button_Group_Observer
-from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+#RoboLCD
+from RoboLCD.lcd.pconsole import pconsole
+from RoboLCD import roboprinter
+from RoboLCD.lcd.Language import lang
+from RoboLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Even_Button
+from RoboLCD.lcd.session_saver import session_saver
+from RoboLCD.lcd.common_screens import KeyboardInput, Modal_Question_No_Title, Button_Group_Observer
+from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
 from directory_browser import Directory_Browser, Screen_Node
 from file_screen import StandardFileButton, StandardFileView, File_Option_Button, File_Counter, File_Progress, Empty_Popup, KeyboardInput_file_bb
 
@@ -53,7 +58,7 @@ class FileOptions(Scroll_Box_Even):
         super(FileOptions, self).__init__(self.buttons)
         self.waiting_for_input = False
         self.show_folders_callback = show_folders_callback
-        self.settings = waldoprinter.printer_instance._settings
+        self.settings = roboprinter.printer_instance._settings
         self.show_files_callback = show_files_callback
         self.refresh_files = refresh_files
         self.create_folder_callback = create_folder_callback
@@ -172,8 +177,8 @@ class FileOptions(Scroll_Box_Even):
         
 
         #back function for cancel and the backbutton
-        back_destination = waldoprinter.screen_controls.get_screen_data()
-        back_function = partial(waldoprinter.screen_controls.populate_old_screen, screen=back_destination)
+        back_destination = roboprinter.screen_controls.get_screen_data()
+        back_function = partial(roboprinter.screen_controls.populate_old_screen, screen=back_destination)
 
         def confirm_exit():
             body_text = lang.pack['Files']['File_Options']['Exit_File_Options']['Body']
@@ -187,7 +192,7 @@ class FileOptions(Scroll_Box_Even):
                                                    )
 
             #add to the screen
-            waldoprinter.screen_controls.set_screen_content(modal_screen,
+            roboprinter.screen_controls.set_screen_content(modal_screen,
                                                            lang.pack['Files']['File_Options']['Exit_File_Options']['Title'],
                                                            back_function=back_function,
                                                            option_function = 'no_option')
@@ -196,7 +201,7 @@ class FileOptions(Scroll_Box_Even):
             back_function()
 
         def exit_fe():
-            waldoprinter.waldosm.go_back_to_main('printer_status_tab' )
+            roboprinter.robosm.go_back_to_main('printer_status_tab' )
         
         confirm_exit()
 
@@ -214,13 +219,13 @@ class FileOptions(Scroll_Box_Even):
             return True
         else:
             if self.original_screen != None:
-                waldoprinter.screen_controls.populate_old_screen(self.original_screen)
+                roboprinter.screen_controls.populate_old_screen(self.original_screen)
             return False 
 
     def refresh(self, *args, **kwargs):
         #refresh File Lists
         self.refresh_files()
-        waldoprinter.screen_controls.populate_old_screen(self.original_screen)
+        roboprinter.screen_controls.populate_old_screen(self.original_screen)
 
     def populate_screen(self):
 
@@ -229,11 +234,11 @@ class FileOptions(Scroll_Box_Even):
         self.repopulate_for_new_screen()
 
         #remake the File_BB screen
-        waldoprinter.screen_controls.update_title(self.title)
+        roboprinter.screen_controls.update_title(self.title)
 
         #change the option function as needed
         if 'option_function' in self.cur_list.screen:
-            waldoprinter.screen_controls.update_option_function(self.cur_list.screen['option_function'], self.cur_list.screen['option_icon'])
+            roboprinter.screen_controls.update_option_function(self.cur_list.screen['option_function'], self.cur_list.screen['option_icon'])
 
     #This function links to the sorting buttons to detirmine what the sorting order of files should be
     #it will store this as a dictionary with the sort type and the option that goes along with that sorting type.
@@ -255,7 +260,7 @@ class FileOptions(Scroll_Box_Even):
         #Go back to the file screen.
         self.return_to_previous_list()
         if self.original_screen != None:
-            waldoprinter.screen_controls.populate_old_screen(self.original_screen)
+            roboprinter.screen_controls.populate_old_screen(self.original_screen)
             
 
     def set_default_sorting_option(self):
@@ -263,7 +268,11 @@ class FileOptions(Scroll_Box_Even):
         self.sorting_option = self.settings.get(['sorting_config'])
 
         #Protection for new machines that do not have this value initialized yet.
-        if self.sorting_option == {}:
+        robo_sorting_options = [lang.pack['Files']['Sort_Files']['Type'],
+                                lang.pack['Files']['Sort_Files']['Size'],
+                                lang.pack['Files']['Sort_Files']['Date'],
+                                lang.pack['Files']['Sort_Files']['Alphabet']]
+        if self.sorting_option == {} or not self.sorting_option['sort'] in robo_sorting_options:
             self.set_sorting_options()
 
         #set that button to active
@@ -318,17 +327,17 @@ class FileOptions(Scroll_Box_Even):
         #Throw the selected list over to file_explorer so it can block out any 
         update_selected_folders(selected_folders_path)
         #change screen back to lead back to the file select screen
-        file_select_screen = waldoprinter.screen_controls.get_screen_data()
+        file_select_screen = roboprinter.screen_controls.get_screen_data()
 
-        waldoprinter.screen_controls.populate_old_screen(file_options_screen)
+        roboprinter.screen_controls.populate_old_screen(file_options_screen)
         self.switch_lists('modify_files')
 
         def back_function():
             self.return_to_previous_list() #return to the List Option Page
             resume_file_select() #tell the File Explorer to go back to the file select screen
-            waldoprinter.screen_controls.populate_old_screen(file_select_screen, ignore_update=True) #return to the file select screen
+            roboprinter.screen_controls.populate_old_screen(file_select_screen, ignore_update=True) #return to the file select screen
 
-        waldoprinter.screen_controls.update_back_function(back_function)
+        roboprinter.screen_controls.update_back_function(back_function)
 
 
     def modify_files(self):
@@ -360,8 +369,8 @@ class FileOptions(Scroll_Box_Even):
         if modify_option == lang.pack['Files']['Modify_Files']['Delete']:
 
             #back function for cancel and the backbutton
-            back_destination = waldoprinter.screen_controls.get_screen_data()
-            back_function = partial(waldoprinter.screen_controls.populate_old_screen, screen=back_destination)
+            back_destination = roboprinter.screen_controls.get_screen_data()
+            back_function = partial(roboprinter.screen_controls.populate_old_screen, screen=back_destination)
 
             def confirm_delete():
                 body_text = lang.pack['Files']['Delete_File_Conf']['Body']
@@ -375,7 +384,7 @@ class FileOptions(Scroll_Box_Even):
                                                        )
 
                 #add to the screen
-                waldoprinter.screen_controls.set_screen_content(modal_screen,
+                roboprinter.screen_controls.set_screen_content(modal_screen,
                                                                lang.pack['Files']['Delete_File_Conf']['Title'],
                                                                back_function=back_function,
                                                                option_function = 'no_option')
@@ -443,8 +452,20 @@ class FileOptions(Scroll_Box_Even):
                 file_exists = self.storage.file_exists(final_name)
 
         return final_name
-                            
 
+    #This function is used for testing if two paths are the same file
+    def same_file(self, filepath, name, destination):
+        Logger.info(filepath)
+        Logger.info(name)
+        Logger.info(destination)
+        if destination == '':
+            final_destination = name
+        else:
+            final_destination = destination + "/" + name
+        Logger.info(final_destination)
+        if filepath == final_destination:
+          return True
+        return False
 
 
         
@@ -652,12 +673,22 @@ class FileOptions(Scroll_Box_Even):
             def keep_action(dt):
                 try:
                     if self.file['type'] == "folder":
+                        same_folder = self.same_file(self.file['path'], self.file['name'], destination)
                         final_name = self.name_iterator(self.file['name'], destination, file_type='folder')
-                        self.storage.move_folder(self.file['path'], final_name)
+
+                        if not same_folder:
+                          self.storage.move_folder(self.file['path'], final_name)
+                        else:
+                          self.storage.copy_folder(self.file['path'], final_name)
         
                     else:
+                        same_file = self.same_file(self.file['path'], self.file['name'], destination)
                         final_name = self.name_iterator(self.file['name'], destination, file_type='file')
-                        self.storage.move_file(self.file['path'], final_name)
+
+                        if not same_file:
+                          self.storage.move_file(self.file['path'], final_name)
+                        else:
+                          self.storage.copy_file(self.file['path'], final_name)
 
                 except Exception as e:
                     Logger.info("!!!!!!!!!!!!!!! Error: " + str(e))
@@ -789,12 +820,44 @@ class FileOptions(Scroll_Box_Even):
 
         Clock.schedule_once(delete_next_file, 0.2)
 
+    #This will change the permissions to the USB folder and try again. This
+    # def change_permissions_and_try_create_folder(self, destination):
+    #     try:
+    #         import os
+    #         import subprocess
+    #         #chown the USB folder
+    #         USB_folder =  os.path.expanduser('~/.octoprint/uploads/USB')
+    #         command = "sudo chown pi:pi " + str(USB_folder)
+    #         Logger.info("Executing command " + str(command))
+    
+    #         #wait for command to finish executing
+    #         subprocess.Popen(command,
+    #                          stdout=subprocess.PIPE,
+    #                          shell=True
+    #                          )
+    #         output, error = temp_p.communicate()
+    #         p_status = temp_p.wait()
+
+    #         Logger.info("Finished Executing! Attempting to add folder!")
+    
+    #         self.storage.add_folder(destination, ignore_existing=True)
+    #         return True
+    #     except Exception as e:
+    #         Logger.info("Creating Permissions Failed! Erroring out!")
+    #         return False
 
     def create_new_folder(self, destination, file_callback):
 
         #get the current screen so we can travel back to it
-        current_screen = waldoprinter.screen_controls.get_screen_data()
-        back_function = partial(waldoprinter.screen_controls.populate_old_screen, screen=current_screen)
+        current_screen = roboprinter.screen_controls.get_screen_data()
+        back_function = partial(roboprinter.screen_controls.populate_old_screen, screen=current_screen)
+        self.error_popup = False
+
+        def error_out():
+            if not self.error_popup:
+                self.error_popup = True
+                ep = Error_Popup(lang.pack['Files']['File_Options']['Folder_Error']['Title'], lang.pack['Files']['File_Options']['Folder_Error']['Body'])
+                ep.show()
 
         def create_keyboard(default_text = lang.pack['Files']['Keyboard']['New_Folder']):
             #populate a screen with a keyboard as the object
@@ -809,7 +872,15 @@ class FileOptions(Scroll_Box_Even):
 
 
             def make_new_folder_action():
-                self.storage.add_folder(destination + '/' + folder_name, ignore_existing=True)
+                try:
+                    self.storage.add_folder(destination + '/' + folder_name, ignore_existing=True)
+                except Exception as e:
+                    Logger.info("!!!!!!!!!!!!!!!!!!!!! Error!")
+                    traceback.print_exc()
+                    error_out()
+
+
+                
     
                 #return file options to root options
                 while self.return_to_previous_list():
@@ -832,7 +903,7 @@ class FileOptions(Scroll_Box_Even):
                                                        )
 
                 #make screen
-                waldoprinter.screen_controls.set_screen_content(modal_screen,
+                roboprinter.screen_controls.set_screen_content(modal_screen,
                                                                title,
                                                                back_function = back_function,
                                                                option_function = 'no_option')

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler modded by BH
+# @Date:   2017-09-18 15:07:34
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:19:07
 from WaldoLCD import waldoprinter
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty
@@ -202,12 +207,13 @@ class WifiButton(Button):
             self.ids.wifi_signal.source = 'Icons/wifi_4.png'
 
 
-class WifiPasswordInput(FloatLayout):
+class WifiPasswordInput(FloatLayout, object):
     """
     Manages the wifi password input layout and its child widgets. Main functionality -- display password and keyboard, allow user to input password with keyboard, allow user to toggle between different keyboards (letters, special characters, and numbers)
     """
     ssid = StringProperty('')
     kbContainer = ObjectProperty()
+    _password_buffer = ''
 
     def __init__(self, **kwargs):
         super(WifiPasswordInput, self).__init__(**kwargs)
@@ -218,7 +224,17 @@ class WifiPasswordInput(FloatLayout):
 
         saved_pword = self.check_for_password()
         if  saved_pword != False:
-            self.ids.password.text = saved_pword
+
+            self.password_buffer = saved_pword
+            self.ids.password.text = '*' * len(self.password_buffer)
+
+    @property
+    def password_buffer(self):
+        return self._password_buffer
+
+    @password_buffer.setter
+    def password_buffer(self, update):
+        self._password_buffer = update
 
     def check_for_password(self):
         saved_wifi = self.settings.get(['Wifi'])
@@ -272,14 +288,18 @@ class WifiPasswordInput(FloatLayout):
         # Writes to self.ids.password.text
         if self.ids.password.text == waldoprinter.lang.pack['WiFi']['Enter_Password']: #clear stub text with first keyboard push
             self.ids.password.text = ''
+            self.password_buffer = ''
         if keycode == 'backspace':
             self.ids.password.text = self.ids.password.text[:-1]
+            self.password_buffer = self.password_buffer[:-1]
         elif keycode == 'capslock' or keycode == 'normal' or keycode == 'special':
             pass
         elif keycode == 'toggle':
             self.toggle_keyboard()
         else:
+            self.ids.password.text = '*' * len(self.ids.password.text)
             self.ids.password.text += text
+            self.password_buffer += text
 
     def toggle_keyboard(self):
         # Logger.info('Current Keyboard: {}'.format(dir(self._keyboard)))
@@ -309,7 +329,7 @@ class WifiFailure(BoxLayout):
         super(WifiFailure, self).__init__()
 
 class SuccessButton(Button):
-    current_screen = StringProperty('') #Deprecated 8/24 No longer necessary since this button is binded to go_back_to_main which only takes self as argument
+    current_screen = StringProperty('') #Deprecated 8/24 No longer necessary since this button is bound to go_back_to_main which only takes self as argument
 
 class WifiConnecting(FloatLayout):
     ssid = StringProperty('')
@@ -361,13 +381,6 @@ class WifiConfiguration(Widget):
         encoded_string = "".join(encoded_chars)
         return base64.urlsafe_b64encode(encoded_string)
 
-    
-
-
-
-
-
-
     def generate_wifi_list_screen(self):
         self.wifi_grid = GridLayout(cols=1, padding=0, spacing=0)
         self.placeholder = WifiLoadingList()
@@ -411,7 +424,7 @@ class WifiConfiguration(Widget):
 
         # wifi credentials
         if obj.id == 'encrypted':
-            psk = obj.ids.password.text
+            psk = obj.password_buffer
         else:
             psk = ''
         ssid = obj.ssid
@@ -463,23 +476,31 @@ class WifiConfiguration(Widget):
 
 
     def _generate_success_screen(self, ssid, *args):
-        s = Screen(name=self.name+'[3]')
-        c = WifiConfirmation(ssid=ssid)
-        s.add_widget(c)
+        name = self.name+'success'
+        if name in self.rsm.screens:
+            self.rms.current = name
+        else:
+            s = Screen(name=name)
+            c = WifiConfirmation(ssid=ssid)
+            s.add_widget(c)
 
-        self.rsm.add_widget(s)
-        self.rsm.current = s.name
+            self.rsm.add_widget(s)
+            self.rsm.current = s.name
 
     def _generate_failure_screen(self, *args):
-        s = Screen(name=self.name+'[3]')
-        c = WifiFailure(self._retry_config)
-        s.add_widget(c)
+        name  = self.name+'failure'
+        if name in self.rsm.screens:
+            self.rms.current = name
+        else:
+            s = Screen(name=name)
+            c = WifiFailure(self._retry_config)
+            s.add_widget(c)
 
-        self.rsm.add_widget(s)
-        self.rsm.current = s.name
+            self.rsm.add_widget(s)
+            self.rsm.current = s.name
 
     def _retry_config(self, *args):
-        self.rsm.go_back_to_screen(self.name+'[3]', self.name+'[1]')
+        self.rsm.go_back_to_screen(self.rsm.current, self.name+'[1]')
 
     def _connect(self, data):
         try:

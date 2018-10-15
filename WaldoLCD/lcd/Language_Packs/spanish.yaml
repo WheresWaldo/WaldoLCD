@@ -65,7 +65,7 @@ Warning:
 
   Update:
     Sub_Title: "Actualización disponible"
-    Body: "\n\n¿Le gustaría instalar la actualización?\nChangelog: [color=#69B3E7]github.com/WheresWaldo/changelogs"
+    Body: "\n\n¿Le gustaría instalar la actualización?\nChangelog: [color=#69B3E7]Robo3D.com/changelogs"
 
   USB_Progress:
     Waiting: "En espera"
@@ -132,7 +132,7 @@ Utilities:
   Webcam_Status: "Estado de la cámara"
 
 
-WaldoIcons:
+RoboIcons:
   Configure_WiFi: "Configurar Wi-Fi"
   Start_WiFi: "Iniciar Hotspot Wi-Fi"
   Network_Status: "Estado de la red"
@@ -176,7 +176,7 @@ System:
 
 
 
-Waldo_Controls:
+Robo_Controls:
   Temperature_Controls: "Temperatura"
   Motor_Controls: "Motores"
 
@@ -304,9 +304,9 @@ Preheat:
     Title: "Edit Temperature" #NOT TRANSLATED
   Errors:
     Ext1_Error: "\nExtruder Error" #NOT TRANSLATED
-    Ext1_Body: "Extruder was set above 290°C. Printer has\nautomatically set the extruder to 290°C" #NOT TRANSLATED
+    Ext1_Body: "Extruder was set above 290°C. Robo has\nautomatically set the extruder to 290°C" #NOT TRANSLATED
     Bed_Error: "\nBed Error" #NOT TRANSLATED
-    Bed_Body: "Print Bed was set above 100°C. Printer has\nautomatically set the bed to 100°C" #NOT TRANSLATED
+    Bed_Body: "Print Bed was set above 100°C. Robo has\nautomatically set the bed to 100°C" #NOT TRANSLATED
   Delete:
     Title: "Delete Preset" #NOT TRANSLATED
     Body: "Are you sure you want to delete settings for\n" #NOT TRANSLATED
@@ -615,7 +615,7 @@ Filament:
   Button1: "OK"
   Button2: "Asistente de filamento"
 
-#Waldo is the product name
+#Robo is the product name
 Error_Detection:
   MAINBOARD:
     Title: "Error de conexión"
@@ -647,8 +647,8 @@ Error_Detection:
     Body: "Vuelva a cargar más filamento"
     E_Title: "Estatus del filamento"
   DEFAULT:
-    Title_Idle: "Impresora listo"
-    Title_Active: "Impresora activo"
+    Title_Idle: "Robo listo"
+    Title_Active: "Robo activo"
     Body_Idle: "¡Vamos a imprimir algo!"
     Body_Active: "Impresión en curso."
 
@@ -710,7 +710,7 @@ Update_Printer:
   Welcome:
     Installed: "Instalado:"
     Available: "Disponible:"
-    WaldoOS: "WaldoOS"
+    RoboOS: "RoboOS"
     Update: "Actualizar"
     Up2Date: "Al día"
 

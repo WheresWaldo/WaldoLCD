@@ -25,8 +25,10 @@ Builder.load_string("""
 
 # Declare both screens
 
+
 class MenuScreen(Screen):
     pass
+
 
 class SettingsScreen(Screen):
     pass
@@ -35,6 +37,7 @@ class SettingsScreen(Screen):
 sm = ScreenManager(transition=NoTransition())
 sm.add_widget(MenuScreen(name='menu'))
 sm.add_widget(SettingsScreen(name='settings'))
+
 
 class TestApp(App):
 

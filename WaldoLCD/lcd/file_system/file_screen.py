@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-29 15:09:04
+# @Last Modified by:   Matt Pedler
+# @Last Modified time: 2017-10-27 13:20:24
 #Kivy
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -16,7 +21,7 @@ from kivy.uix.popup import Popup
 from kivy.logger import Logger
 from kivy.core.window import Window
 from kivy.uix.vkeyboard import VKeyboard
-from WaldoLCD.lcd.Language import lang
+from RoboLCD.lcd.Language import lang
 
 
 #python
@@ -29,13 +34,13 @@ import collections
 import traceback
 from functools import partial
 
-#WaldoLCD
-from WaldoLCD import waldoprinter
-from WaldoLCD.lcd.pconsole import pconsole
-from WaldoLCD.lcd.Language import lang
-from WaldoLCD.lcd.session_saver import session_saver
-from WaldoLCD.lcd.common_screens import Error_Popup
-from WaldoLCD.lcd.connection_popup import Zoffset_Warning_Popup
+#RoboLCD
+from RoboLCD import roboprinter
+from RoboLCD.lcd.pconsole import pconsole
+from RoboLCD.lcd.Language import lang
+from RoboLCD.lcd.session_saver import session_saver
+from RoboLCD.lcd.common_screens import Error_Popup
+from RoboLCD.lcd.connection_popup import Zoffset_Warning_Popup
 
 
 #octoprint
@@ -55,7 +60,7 @@ class StandardFileButton(Button):
         self.icon = icon
         self.file_data = file_data
         self.callback = callback
-        self.settings = waldoprinter.printer_instance._settings
+        self.settings = roboprinter.printer_instance._settings
        
     def file_on_release(self):
         if self.callback != None and self.file_data != None:
@@ -184,7 +189,7 @@ class File_Progress(BoxLayout):
         self.progress_width = self.ids.progress_bar_goes_here.width
         self.progress_number = (float(progress) / 100.00) * float(self.progress_width)
         p_transformed = int(progress)
-        self.progress = '[size=40]{}'.format(p_transformed) + waldoprinter.lang.pack['Printer_Status']['Percent'] + '[/size]'
+        self.progress = '[size=40]{}'.format(p_transformed) + roboprinter.lang.pack['Printer_Status']['Percent'] + '[/size]'
 
 class Empty_Popup(ModalView):
     """docstring for Empty_Popup"""
@@ -213,7 +218,7 @@ class StandardFileView(BoxLayout):
         self.file_data = file_data
         self.call_function = call_function
         self.body_text = body_text
-        if waldoprinter.printer_instance._printer.is_ready() and not waldoprinter.printer_instance._printer.is_printing() and not waldoprinter.printer_instance._printer.is_paused():
+        if roboprinter.printer_instance._printer.is_ready() and not roboprinter.printer_instance._printer.is_printing() and not roboprinter.printer_instance._printer.is_paused():
             self.button_state = False
         else:
             self.button_state = True
@@ -533,7 +538,7 @@ class KeyboardInput_file_bb(FloatLayout):
             raise Exception("back destination needs to be set with a screen dictionary to go back to")
 
         self.first_press = False
-        waldoprinter.screen_controls.set_screen_content(self, #content
+        roboprinter.screen_controls.set_screen_content(self, #content
                                                        self.title, #title of content
                                                        back_function=self.previous_screen, #back button function
                                                        option_function=self.next_screen,
@@ -550,7 +555,7 @@ class KeyboardInput_file_bb(FloatLayout):
         #turn off keyboard
         self.close_screen()
         #go back to screen
-        waldoprinter.screen_controls.populate_old_screen(self.back_destination)
+        roboprinter.screen_controls.populate_old_screen(self.back_destination)
 
     def next_screen(self):
         self.close_screen()
@@ -690,13 +695,13 @@ class PrintFile(GridLayout):
 
     #This function will check the filename against saved data on the machine and return saved meta data
     def check_saved_data(self):
-        self.octo_meta = waldoprinter.printer_instance._file_manager
+        self.octo_meta = roboprinter.printer_instance._file_manager
         saved_data = self.octo_meta.get_metadata(octoprint.filemanager.FileDestinations.LOCAL , self.file_path)
 
 
-        if 'waldo_data' in saved_data:
+        if 'robo_data' in saved_data:
             self.found_meta_data = True
-            return saved_data['waldo_data']
+            return saved_data['robo_data']
             
         else:
             #queue the file for processing. This also checks to see if we have already sent the file over to be analyzed
@@ -705,25 +710,25 @@ class PrintFile(GridLayout):
                 mock_file_system = {
                     self.file['name'] : self.file
                 }
-                waldoprinter.printer_instance.start_analysis(files=mock_file_system)
+                roboprinter.printer_instance.start_analysis(files=mock_file_system)
 
             return False
 
 
     def update(self, dt):
-        if waldoprinter.printer_instance._printer.is_paused():
+        if roboprinter.printer_instance._printer.is_paused():
             self.status = 'PRINTER IS BUSY'
         else:
             self.status = self.is_ready_to_print()
         #toggle between button states
         if self.status == 'PRINTER IS BUSY' and self.ids.start.background_normal == "Icons/green_button_style.png":
             self.ids.start.background_normal = "Icons/red_button_style.png"
-            self.ids.start.button_text = '[size=30]' + waldoprinter.lang.pack['Files']['File_Status']['Busy'] + '[/size]'
+            self.ids.start.button_text = '[size=30]' + roboprinter.lang.pack['Files']['File_Status']['Busy'] + '[/size]'
             self.ids.start.image_icon = 'Icons/Manual_Control/printer_button_icon.png'
          
         elif self.status == "READY TO PRINT" and self.ids.start.background_normal == "Icons/red_button_style.png":
             self.ids.start.background_normal = "Icons/green_button_style.png"
-            self.ids.start.button_text = '[size=30]' + waldoprinter.lang.pack['Files']['File_Status']['Start'] + '[/size]'
+            self.ids.start.button_text = '[size=30]' + roboprinter.lang.pack['Files']['File_Status']['Start'] + '[/size]'
             self.ids.start.image_icon = 'Icons/Manual_Control/start_button_icon.png'
 
         #check for meta data and update
@@ -762,7 +767,7 @@ class PrintFile(GridLayout):
                     self.force_start_print()
         except Exception as e:
             #raise error
-            error = Error_Popup(waldoprinter.lang.pack['Files']['File_Error']['Title'],waldoprinter.lang.pack['Files']['File_Error']['Body'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab'))
+            error = Error_Popup(roboprinter.lang.pack['Files']['File_Error']['Title'],roboprinter.lang.pack['Files']['File_Error']['Body'],callback=partial(roboprinter.robosm.go_back_to_main, tab='printer_status_tab'))
             error.open()
             Logger.info("Start Print Error")
             Logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "+ str(e))
@@ -771,11 +776,11 @@ class PrintFile(GridLayout):
     def force_start_print(self, *args):
         """Starts print but cannot start a print when the printer is busy"""
         try:
-            path_on_disk = waldoprinter.printer_instance._file_manager.path_on_disk(octoprint.filemanager.FileDestinations.LOCAL, self.file_path)
-            waldoprinter.printer_instance._printer.select_file(path=path_on_disk, sd=False, printAfterSelect=True)
+            path_on_disk = roboprinter.printer_instance._file_manager.path_on_disk(octoprint.filemanager.FileDestinations.LOCAL, self.file_path)
+            roboprinter.printer_instance._printer.select_file(path=path_on_disk, sd=False, printAfterSelect=True)
         except Exception as e:
             #raise error
-            error = Error_Popup(waldoprinter.lang.pack['Files']['File_Error']['Title'],waldoprinter.lang.pack['Files']['File_Error']['Body'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab'))
+            error = Error_Popup(roboprinter.lang.pack['Files']['File_Error']['Title'],roboprinter.lang.pack['Files']['File_Error']['Body'],callback=partial(roboprinter.robosm.go_back_to_main, tab='printer_status_tab'))
             error.open()
             Logger.info("Force Start Print Error")
             Logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "+ str(e))
@@ -786,8 +791,8 @@ class PrintFile(GridLayout):
 
     def is_ready_to_print(self):
         """ whether the printer is currently operational and ready for a new print job"""
-        is_ready = waldoprinter.printer_instance._printer.is_ready()
-        printing = waldoprinter.printer_instance._printer.is_printing()
+        is_ready = roboprinter.printer_instance._printer.is_ready()
+        printing = roboprinter.printer_instance._printer.is_printing()
         if is_ready and not printing:
             return 'READY TO PRINT'
         else:

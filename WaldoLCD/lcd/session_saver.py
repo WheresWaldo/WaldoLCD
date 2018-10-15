@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-18 15:07:34
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:13:39
 class Session_Saver():
     """docstring for Session_Saver"""
     event_updaters = {}
@@ -20,5 +25,6 @@ class Session_Saver():
         
         for updater in self.event_updaters:
             self.event_updaters[updater](event, payload)
+
 
 session_saver = Session_Saver()

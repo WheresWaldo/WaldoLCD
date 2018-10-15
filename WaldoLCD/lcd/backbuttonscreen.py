@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-07-14 12:42:48
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:12:06
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ObjectProperty, StringProperty
 from .. import waldoprinter

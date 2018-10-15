@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-28 12:22:30
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 09:18:47
 # coding=utf-8
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -6,16 +11,22 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.logger import Logger
 from kivy.clock import Clock
-from .. import waldoprinter
+from WaldoLCD import waldoprinter
 import math
 import subprocess
 from pconsole import pconsole
 from session_saver import session_saver
 import time
-from bed_calibration_wizard import Modal_Question
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, Button_Screen, Picture_Button_Screen, Title_Button_Screen
+from WaldoLCD.lcd.wizards.bed_calibration.bed_calibration_wizard import Modal_Question
 from common_screens import Button_Screen, Picture_Button_Screen, Title_Button_Screen
+from WaldoLCD.lcd.wizards.wizard_overseer import Wizards
+
 from functools import partial
 from kivy.core.window import Window
+
+#Re-Enable when RRUs server is deployed
+#from WaldoLCD.lcd.update_system.Update_Interface import Update_Interface
 
 class Refresh_Screen(Title_Button_Screen):
     # title_text, body_text, image_source, button_function, button_text = "OK", **kwargs
@@ -236,7 +247,8 @@ class Filament_Runout(Modal_Question):
     def __init__(self):
         self.title = waldoprinter.lang.pack['Filament']['Title']
         self.body_text = waldoprinter.lang.pack['Filament']['Body']
-        func = partial(waldoprinter.waldosm.generate_screens, 'FIL_CHANGE')
+        wiz = Wizards(soft_load=True, back_destination='main')
+        func = partial(wiz.load_wizard, generator='FIL_LOAD')
         super(Filament_Runout, self).__init__(self.title, self.body_text,waldoprinter.lang.pack['Filament']['Button1'], waldoprinter.lang.pack['Filament']['Button2'], self.goto_main, func)
 
     def goto_main(self):
@@ -255,12 +267,18 @@ class Error_Detection(Button):
     pause_lock = False
     caret_size = NumericProperty(0.0)
     firm_lock = False
+    update_message = StringProperty("")
+    update_available = False
 
     first_default = False
 
     def __init__(self):
         super(Error_Detection, self).__init__()
         Clock.schedule_interval(self.check_connection_status, 0.2)
+
+        #set a timer to check for updates
+        #self.check_update_available(1)
+        #Clock.schedule_interval(self.check_update_available, 3600)
         
     def populate_error(self, error):
 
@@ -305,6 +323,13 @@ class Error_Detection(Button):
                 'body' : waldoprinter.lang.pack['Error_Detection']['FIL_RUNOUT']['Body'],
                 'icon' : "Icons/Printer Status/Filament warning.png",
                 'function': self.fil_runout,
+                'caret': True
+            },
+            'UPDATE_AVAILABLE': {
+                'title': waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['Title'],
+                'body' : "[color=#69B3E7]" + self.update_message + waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['Body'],
+                'icon' : 'Icons/White_Utilities/Updates.png',
+                'function': self.update_warning,
                 'caret': True
             },
             'NONE':{
@@ -478,6 +503,56 @@ class Error_Detection(Button):
 
         return {'actual':actual, 'target':target}
 
+    def check_update_available(self, dt):
+        ui = Update_Interface()
+        updates = ui.get_updates()
+        if updates != False:
+            for update in updates:
+                if 'installed' in update and not update['installed']:
+                    if 'name' in update and 'version' in update:
+                        self.update_message = str(update['name'] + ": " + update['version'])
+                    else:
+                        self.update_message = ""
+                    Logger.info("Update Available")
+                    self.update_available = True
+                    return True
+        
+
+    def update_warning(self):
+
+        def goto_update():
+            waldoprinter.waldosm.generate_screens('UPDATES')
+
+        def cancel():
+            waldoprinter.waldosm.go_back_to_main('printer_status_tab')
+
+
+        def update_warning():
+            title = waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['E_Title']
+            body_text = waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['E_Body']
+            option1 = waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['E_Update']
+            option2 = waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['E_Cancel']
+            modal_screen = Modal_Question(title,
+                                          body_text, 
+                                          option1, 
+                                          option2, 
+                                          goto_update, 
+                                          cancel
+                                          )
+            name = 'update_warning'
+            title = waldoprinter.lang.pack['Error_Detection']['UPDATE_AVAILABLE']['Second_Title']
+            back_destination = waldoprinter.waldosm.current
+            waldoprinter.back_screen(name=name,
+                                    title=title,
+                                    back_destination=back_destination,
+                                    content=modal_screen
+                                )
+        update_warning()
+
+    
+        
+
+
     ############################################Detirmine Errors##################################################
 
     def check_connection_status(self, dt):
@@ -564,6 +639,8 @@ class Error_Detection(Button):
 
         elif is_updating_firm:
             self.populate_error('FIRMWARE')
+        elif self.update_available:
+            self.populate_error('UPDATE_AVAILABLE')
         else:
             self.populate_error('DEFAULT')
 

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-07-14 12:42:48
+# @Last Modified by:   Matt Pedler
+# @Last Modified time: 2017-10-27 13:18:42
 import re
 
 def output_gib(in_name, out_name):
@@ -38,10 +43,20 @@ def output_gib(in_name, out_name):
                                     nl.remove(nl[0])
                             counter += 1
 
+
+
+
+
+
                     #write the line
                     new.write(final_line + "\n")
 
+
                 else:
                     new.write(line)
+
+
+
+                    
 
 output_gib("english.yaml", "redo.yaml")

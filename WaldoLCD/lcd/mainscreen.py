@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-19 11:46:30
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:04:38
 from kivy.uix.screenmanager import Screen
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.uix.gridlayout import GridLayout
@@ -8,6 +13,7 @@ from kivy.logger import Logger
 from pconsole import pconsole
 from .. import waldoprinter
 from multiprocessing import Process
+from WaldoLCD.lcd import mainscreen_info
 
 DEFAULT_FONT = 'Roboto'
 

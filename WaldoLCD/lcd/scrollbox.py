@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-10-25 16:48:06
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 08:33:00
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
@@ -124,13 +129,20 @@ class Scroll_Box_Even(BoxLayout):
 
 class Scroll_Box_Even_Button(Button):
     button_text = StringProperty("Error")
-    generator= ObjectProperty("0")
+    generator= ObjectProperty(None)
     arg = ObjectProperty("ERROR")
     def __init__(self, text_button, generator_fuction, arg):
         super(Scroll_Box_Even_Button, self).__init__()
-        self.button_text = text_button.encode('utf-8')
+        self.button_text = text_button
         self.generator = generator_fuction
         self.arg = arg
+
+    def cleanup(self):
+        Logger.info("Cleaning up SBE button")
+        #dereference the generator
+        self.generator = "" #set it to a different object that is not our bound method
+        #remove self from parent widget
+        self.parent.remove_widget(self)
 
 
 
@@ -190,7 +202,7 @@ class Waldo_Icons(Button):
     callback = ObjectProperty(None)
     def __init__(self, _image_source, _icon_name, _generator_function, callback=None):
         super(Waldo_Icons, self).__init__()
-        self. generator = _generator_function
+        self.generator = _generator_function
         self.img_source = _image_source
         self.original_icon_name = _icon_name
         self.icon_name = _icon_name
@@ -209,7 +221,7 @@ class Waldo_Icons(Button):
         #check if this is the first iteration
         if not self.first_loop:
             self.first_loop = True
-            self.callback(generator=self. generator, name=self.icon_name)
+            self.callback(generator=self.generator, name=self.icon_name)
 
         if self.current_screen != waldoprinter.waldosm.current:
             self.icon_name = self.original_icon_name

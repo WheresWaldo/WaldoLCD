@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-27 17:53:43
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 11:57:31
 # coding=utf-8
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -9,13 +14,13 @@ from kivy.uix.button import Button
 from kivy.logger import Logger
 from kivy.clock import Clock
 from kivy.uix.modalview import ModalView
-from .. import waldoprinter
+from WaldoLCD import waldoprinter
 from connection_popup import Zoffset_Warning_Popup, Update_Warning_Popup
 import math
 import subprocess
 from multiprocessing import Process
 from pconsole import pconsole
-from updater import UpdateScreen
+from WaldoLCD.lcd.update_system.old_system.updater import UpdateScreen
 from session_saver import session_saver
 import time
 import traceback
@@ -297,7 +302,7 @@ class PrinterStatusContent(BoxLayout):
             self.ids.tools.add_widget(bed)
 
         elif tool0 and bed:
-            tool_0 = Tool_Status(waldoprinter.lang.pack['Tool_Status']['Tool1'], "tool0")
+            tool_0 = Tool_Status(waldoprinter.lang.pack['Tool_Status']['Tool'], "tool0")
             bed = Tool_Status(waldoprinter.lang.pack['Tool_Status']['Bed'], "bed")
             self.ids.tools.add_widget(tool_0)
             self.ids.tools.add_widget(Label())
@@ -305,7 +310,7 @@ class PrinterStatusContent(BoxLayout):
             
             
         elif tool0:
-            tool_0 = Tool_Status(waldoprinter.lang.pack['Tool_Status']['Tool1'], "tool0")
+            tool_0 = Tool_Status(waldoprinter.lang.pack['Tool_Status']['Tool'], "tool0")
             self.ids.tools.add_widget(Label())
             self.ids.tools.add_widget(tool_0)
             self.ids.tools.add_widget(Label())
@@ -332,7 +337,6 @@ class PrinterStatusContent(BoxLayout):
         if self.extruder_one_temp != 0 and self.startup == False:
             #Logger.info("Turning Off the Splash Screen!")
             self.detirmine_layout()
-
             #check for updates
             self.check_updates()
             #check for updates every hour
@@ -379,7 +383,6 @@ class PrinterStatusContent(BoxLayout):
         if self.safety_counter == safety_time and self.startup == False:
             self.detirmine_layout()
             self.check_updates()
-            Clock.schedule_interval(self.update_clock, 3600)
             Clock.unschedule(self.splash_event)
             return False
         elif self.safety_counter == safety_time and self.startup == True:

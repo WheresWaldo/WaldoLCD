@@ -639,33 +639,13 @@
         source: root.image_icon
         size: auto_icon.texture_size
         pos: auto_button.x + ((auto_button.width - (auto_icon.width + auto_label.width + 15) ) / 2), auto_button.y  + ((auto_button.height - auto_icon.height) / 2)
-        # canvas.after:
-        #     Color:
-        #         rgba: 1,0,0,1
-        #     Line:
-        #         cap: 'round'
-        #         joint: 'round'
-        #         close: False
-        #         width: 1
-        #         points: auto_icon.x, auto_icon.y, auto_icon.x, auto_icon.y + auto_icon.height, auto_icon.x + auto_icon.width, auto_icon.y + auto_icon.height, auto_icon.x + auto_icon.width, auto_icon.y, auto_icon.x,auto_icon.y
 
     Label:
-        markup: True
         id: auto_label
-        text: root.button_text
+        text: "" + root.button_text
         size: auto_label.texture_size
         pos: (auto_icon.x + auto_icon.width) + 15, auto_button.y  + ((auto_button.height - auto_label.height) / 2)
-        
-        # canvas.after:
-        #     Color:
-        #         rgba: 0,1,0,1
-        #     Line:
-        #         cap: 'round'
-        #         joint: 'round'
-        #         close: False
-        #         width: 1
-        #         points: auto_label.x, auto_label.y, auto_label.x, auto_label.y + auto_label.height, auto_label.x + auto_label.width, auto_label.y + auto_label.height, auto_label.x + auto_label.width, auto_label.y, auto_label.x,auto_label.y
-
+        markup: True
 
 <Confirmation_Screen>:
     background_color: 0,0,0,1
@@ -728,6 +708,29 @@
         background_disabled_down: "Icons/button_blue.png"
         background_disabled_normal: "Icons/button_blue.png"
         on_press: root.run_updater()
+
+<Install_Button>:
+    orientation: 'horizontal'
+    padding: 10,10,10,10
+    background_color: 0,0,0,1
+    Label:
+        id: update_version
+        text: '[size=30][color=#69B3E7]' + root.button_text
+        markup: True
+        text_size: self.size
+        halign: 'left'
+        valign: 'center'
+    Button:
+        id: Install_Button
+        size_hint_x: 0.5
+        on_press: root.button_function()
+        background_normal: "Icons/button_blue.png"
+        disabled: root.disabled
+        text: root.install_text
+        font_size: 30
+
+
+
 
 <ModalPopup>:
     background_color: 0,0,0,1
@@ -885,7 +888,7 @@
                     button_text: "[size=30]" + app.root.lang.pack['Popup']['Z_Offset']
                     image_icon: 'Icons/Manual_Control/printer_button_icon.png'
                     background_normal: 'Icons/blue_button_style.png'
-                    callback: app.root.generate_zaxis_wizard
+                    callback: root.generate_z_offset_wizard
                     kwargs: {'name':'zoffset', 'title':'Z Offset Wizard', 'back_destination':'main'}
                     on_press: root.dismiss_popup()
     
@@ -1491,7 +1494,7 @@
 <Preheat_Button>:
     background_color: 0,0,0,1
     id: preheat
-    on_press: root.callback(root.title)
+    on_press: root.execute_callback()
     canvas.after:
         Color:
             rgba: 0.231372549,0.243137255,0.270588235,1
@@ -1505,14 +1508,22 @@
         orientation: 'horizontal'
         pos: preheat.pos
         size: preheat.size
-        Label:
-            size_hint_x: 0.05
+        padding: 30, 0, 0, 0
         Label:
             text_size: self.size
             halign: 'left'
             valign: 'center'
             markup: True
-            text: '[color=#69B3E7][size=30][font=fonts/S-Core - CoreSansD55Bold.otf][b]' + root.title + "[/color][/b][/size][/font]\n[size=25][font=fonts/S-Core - CoreSansD35Regular.otf]" + root.body_text
+            text: '[color=#69B3E7][size=30][font=fonts/S-Core - CoreSansD55Bold.otf][b]' + root.title + root.text_value + "[/color][/b][/size][/font]\n[size=25][font=fonts/S-Core - CoreSansD35Regular.otf]" + root.body_text
+
+<Dual_Buttons>:
+    background_color: 0,0,0,1
+    orientation:'horizontal'
+    spacing: 15
+    padding: 30, 0, 0, 0
+    
+
+
 <Simple_Button>:
     id: simple
     background_normal: root.background_normal
@@ -1525,7 +1536,9 @@
         halign: 'center'
         valign: 'center'
         markup: True
+
 <Option_View>:
+    background_color: 0,0,0,1
     orientation: 'vertical'
     BoxLayout:
         id: button_box
@@ -1536,7 +1549,6 @@
         orientation: 'horizontal'
         padding: root.button_padding
         spacing: root.button_spacing
-
 
 <Motor_Control_Operator>:
     id: MC_Button
@@ -1561,7 +1573,7 @@
 
 <Temperature_Operator>:
     id: MC_Button
-    on_press: root.button_function(name=root.selected_extruder, title=app.root.lang.pack['Utilities']['Tool1'] if root.selected_extruder == 'tool0' else app.root.lang.pack['Utilities']['Tool2'], back_destination='motor_control_screen')
+    on_press: root.button_function(name=root.selected_extruder, title=root.heater_title, back_destination='motor_control_screen')
     background_normal: root.background_normal
     BoxLayout:
         orientation: 'vertical'
@@ -1799,203 +1811,13 @@
             background_down: 'Icons/blue_button_style.png'
 
 
-<Filament_Wizard_1_5>:
-    id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Manual_Control/info_icon.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 115
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=27]' + app.root.lang.pack['Filament_Wizard']['Wizard_Description'] +  '[/size]'
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 20
-
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: None, None
-        width: 225
-        height: 85
-        center_x: screen.center_x
-        center_y: screen.center_y - 85
-
-        Auto_Image_Label_Button:
-            button_text: "[size=30]" + app.root.lang.pack['Filament_Wizard']['Start']
-            image_icon: 'Icons/Manual_Control/start_button_icon.png'
-            background_normal: 'Icons/blue_button_style.png'
-            on_press: root.callback()
-
-
-<Filament_Wizard_2_5>:
-    id: screen
-    Label:
-        size_hint: None, None
-        text: app.root.lang.pack['Filament_Wizard']['Heat_230'] + str(root.extruder_max_temp) + app.root.lang.pack['Filament_Wizard']['Celsius_Alone']
-        font_size: 30
-        text_size: self.x, self.y
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 250
-    Label:
-        size_hint: None, None
-        id:temp_label
-        text: str(root.extruder_temp) + app.root.lang.pack['Filament_Wizard']['Celsius_Alone']
-        font_size: 50
-        halign: 'center'
-        text_size: self.x, self.y
-        center_x: screen.center_x 
-        center_y: screen.center_y + 135
-    ProgressBar:
-        size_hint: None, None
-        max: root.extruder_max_temp
-        value: root.extruder_temp
-        width: 200
-        center_x: screen.center_x
-        center_y: screen.center_y
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=27]' + app.root.lang.pack['Filament_Wizard']['Auto_Next'] +  '[/size]'
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y - 75
-
-<Filament_Wizard_3_5>:
-    id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Manual_Control/retract_icon.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 115
-        allow_stretch: True
-        size: 125,125
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=30]' + app.root.lang.pack['Filament_Wizard']['Remove_Filament'] + '[/size]'
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 20
-
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: None, None
-        width: 225
-        height: 85
-        center_x: screen.center_x
-        center_y: screen.center_y - 85
-
-        Auto_Image_Label_Button:
-            button_text: "[size=30]" + app.root.lang.pack['Filament_Wizard']['Next']
-            image_icon: 'Icons/Manual_Control/next_button_icon.png'
-            background_normal: 'Icons/blue_button_style.png'
-            on_press: root.callback()
-
-<Filament_Wizard_4_5>:
-    id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Manual_Control/cut_filament_icon.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 115
-        allow_stretch: False
-        size: 200,200
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=30]' + app.root.lang.pack['Filament_Wizard']['Cut_Tip'] + '[/size]'
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 20
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: None, None
-        width: 225
-        height: 85
-        center_x: screen.center_x
-        center_y: screen.center_y - 85
-
-        Auto_Image_Label_Button:
-            button_text: "[size=30]" + app.root.lang.pack['Filament_Wizard']['Next']
-            image_icon: 'Icons/Manual_Control/next_button_icon.png'
-            background_normal: 'Icons/blue_button_style.png'
-            on_press: root.callback()
-
-<Filament_Wizard_5_5>:
-    id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Manual_Control/extrude_icon.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 115
-        allow_stretch: True
-        size: 125,125
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=30]' + app.root.lang.pack['Filament_Wizard']['Extrude_Filament'] + '[/size]'
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 20
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: None, None
-        width: 225
-        height: 85
-        center_x: screen.center_x
-        center_y: screen.center_y - 85
-
-        Auto_Image_Label_Button:
-            button_text: "[size=30]" + app.root.lang.pack['Filament_Wizard']['Next']
-            image_icon: 'Icons/Manual_Control/next_button_icon.png'
-            background_normal: 'Icons/blue_button_style.png'
-            on_press: root.callback()
-
-<Filament_Wizard_Finish>:
-    id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Manual_Control/check_icon.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 125
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=40][color=#69B3E7]' + app.root.lang.pack['Filament_Wizard']['Complete_Title'] + '[/color][/size][size=30]' + app.root.lang.pack['Filament_Wizard']['Complete_Body']
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y + 20
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: None, None
-        width: 225
-        height: 85
-        center_x: screen.center_x
-        center_y: screen.center_y - 95
-
-        Auto_Image_Label_Button:
-            button_text: "[size=30]" + app.root.lang.pack['Filament_Wizard']["Ok"]
-            image_icon: 'Icons/Manual_Control/ok_button_icon.png'
-            background_normal: 'Icons/blue_button_style.png'
-            on_press: root.button_function()
-
-
 <Z_Offset_Adjuster>:
     orientation: 'vertical'
     padding: 5,0,5,0
     id: screen
     Label:
         markup: True
-        text: '[size=27]' + app.root.lang.pack['ZOffset_Wizard']['Adjust_Instructions'] + '[/size]'
+        text: '[size=30]' + app.root.lang.pack['ZOffset_Wizard']['Adjust_Instructions'] + '[/size]'
         valign: 'middle'
         halign: 'center'
         text_size: self.size
@@ -2011,7 +1833,7 @@
             on_press: root.toggle_mm_z()
             Image:
                 id: toggle_icon
-                source: 'Icons/Manual_Control/increments_3_2.png'
+                source: root.i_toggle_mm[root.toggle_mm]
                 size_hint: None, None
                 center_x: toggle_mm.center_x
                 center_y: toggle_mm.center_y + 20
@@ -2060,6 +1882,7 @@
         Button:
             id: done
             background_normal: 'Icons/blue_button_style.png'
+            on_press: root.callback()
             Image:
                 source: 'Icons/Manual_Control/ok_button_icon.png'
                 size_hint: None, None
@@ -2174,6 +1997,66 @@
                 source: root.down_icon
                 pos: button_down.pos
                 size: button_down.size
+
+<Scroll_Box_EEPROM_List>:
+    orientation: 'horizontal'
+    spacing: 10
+    scroll: scroll
+
+    BoxLayout:
+        id: content
+        orientation: 'vertical'
+        EEPROM_Button:
+            id:button_1
+        EEPROM_Button:
+            id:button_2
+        EEPROM_Button:
+            id:button_3
+        EEPROM_Button:
+            id:button_4
+        
+    #scroll Buttons
+    BoxLayout:
+        orientation: 'vertical'
+        id:scroll
+        size_hint_x: 0.25
+        spacing: 20
+        padding: 10,10,10,10
+        Button:
+            id:button_up
+            background_normal:"Icons/Printer Status/blank-warning.png"
+            background_down:"Icons/Printer Status/blank-warning.png"
+            Image:
+                source: root.up_icon
+                pos: button_up.pos
+                size: button_up.size
+        Button:
+            id: button_down
+            background_normal:"Icons/Printer Status/blank-warning.png"
+            background_down:"Icons/Printer Status/blank-warning.png"
+            Image:
+                source: root.down_icon
+                pos: button_down.pos
+                size: button_down.size
+
+<EEPROM_Button>:
+    id: sbe_button
+    background_color: (0,0,0,1)
+    on_press: root.callback_caller()
+    BoxLayout:
+        orientation: 'horizontal'
+        x: sbe_button.x
+        y: sbe_button.y
+        size: sbe_button.size
+        Label:
+            size_hint_x: 0.05
+            text: ''
+        Label:
+            markup: True
+            text: "[size=30]" + root.name + str(root.value)
+            valign: 'middle'
+            halign: 'left'
+            text_size: self.width, None
 
 
 
@@ -2453,13 +2336,13 @@
         Button:
             id: apply_change
             background_normal: 'Icons/button_pause_blank.png'
-            on_press: root.go_back()
+            on_press: root.update_variable()
 
             size: root.button_size
             Label:
                 id: change_text
                 markup: True
-                text: u"[size=40]" + app.root.lang.pack['EEPROM']['Apply']
+                text: "[size=40]" + app.root.lang.pack['EEPROM']['Apply']
 
                 center_x: apply_change.center_x
                 center_y: apply_change.center_y
@@ -2472,7 +2355,7 @@
             Label:
                 id: change_text
                 markup: True
-                text : "[size=60]{}".format(root.change_amount_value[root.change_value])
+                text : "[size=60]"+ str(root.change_amount_value[root.change_value])
 
                 center_x: change_increment.center_x
                 center_y: change_increment.center_y
@@ -2927,29 +2810,30 @@
 
 <Temperature_Wait_Screen>:
     id: screen
-    Image:
-        size_hint: None, None
-        source: 'Icons/Icon_Buttons/Preheat.png'
-        center_x: screen.center_x
-        center_y: screen.center_y + 70
-        allow_stretch: True
-        size: 125,125
-    Label:
+    orientation: 'vertical'
+    padding: 0,0,0,15
+
+    Label:     
+        text: '[size=40][color=#69B3E7]' + root.title + '[/size][/color]\n[size=30]' + app.root.lang.pack['Filament_Wizard']['Heat_230'] + str(root.max_temp) + app.root.lang.pack['Filament_Wizard']['Celsius_Alone'] + '[/size]'
+        font_size: 30     
+        text_size: self.size
         markup: True
-        size_hint: None, None
-        text: '[size=30]' + root.body_text
         valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y - 40
-    Label:
-        markup: True
-        size_hint: None, None
-        text: '[size=30]{}'.format(root.temperature) + app.root.lang.pack['Preheat']['Celsius_190']
-        valign: 'middle'
-        halign: 'center'
-        center_x: screen.center_x
-        center_y: screen.center_y - 120
+        halign: 'center'      
+              
+    Label:        
+        id:temp_label     
+        text: str(root.extruder_temp) + app.root.lang.pack['Filament_Wizard']['Celsius_Alone']        
+        font_size: 50   
+        valign: 'middle'  
+        halign: 'center'      
+        text_size: self.size
+
+    Label:        
+        markup: True         
+        text: '[size=30]' + app.root.lang.pack['Filament_Wizard']['Auto_Next'] +  '[/size]'       
+        valign: 'middle'      
+        halign: 'center'        
 
 <Button_Screen>:
     orientation: 'vertical'
@@ -2985,6 +2869,61 @@
                     valign: 'center'
                     halign: 'center'
                     text_size: self.size
+
+<Object_Button_Screen>:
+    orientation: 'vertical'
+    padding: 0,0,0,15
+    
+    BoxLayout:
+        orientation:'vertical'
+        id:custom_object_box
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.5
+        padding: 200, 0, 200, 0
+        Button:
+            id: ok_button
+            on_press: root.button_function()
+            background_normal: "Icons/Slicer wizard icons/button bkg active.png"
+            BoxLayout:
+
+                orientation: 'horizontal'
+                
+                x: ok_button.x
+                y: ok_button.y
+                size: ok_button.size                   
+
+                Label:
+                    id: ok_label
+                    markup:True
+                    text: "[size=30]" + root.button_text
+                    valign: 'center'
+                    halign: 'center'
+                    text_size: self.size
+
+
+
+<Image_on_Button_Screen>:
+    orientation: 'vertical'
+    padding: 0,0,0,15
+    
+    Label:
+        text: "[size=30]" + root.body_text
+        valign: 'center'
+        halign: 'center'
+        text_size: self.size 
+        markup:True
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.5
+        padding: 200, 0, 200, 0
+        Auto_Image_Label_Button:
+            button_text: "[size=30]" + root.button_text
+            image_icon: root.button_image
+            background_normal: "Icons/Slicer wizard icons/button bkg active.png"
+            on_press: root.button_function()
 
 <Picture_Button_Screen>:
     orientation: 'vertical'
@@ -3026,6 +2965,58 @@
                     halign: 'center'
                     text_size: self.size
                     max_lines: 1
+
+<Title_Picture_Image_on_Button_Screen>:
+    orientation: 'vertical'
+    padding: 10,15,10,15
+
+    Image:
+        size_hint_y: 0.4
+        source: root.image_source
+        allow_stretch: False
+   
+    Label:
+        markup:True
+        text: "[size=45][color=#69B3E7]" + root.title_text + "\n" + "[/color][/size][size=30]"+root.body_text + "[/size]"
+        valign: 'center'
+        halign: 'center'
+        text_size: self.size 
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.5
+        padding: 200, 0 ,200, 0 
+        Auto_Image_Label_Button:
+            button_text: "[size=30]" + root.button_text + "[/size]"
+            image_icon: root.button_image
+            background_normal: "Icons/Slicer wizard icons/button bkg active.png"
+            on_press: root.button_function()
+
+<Picture_Image_on_Button_Screen>:
+    orientation: 'vertical'
+    padding: 10,15,10,15
+
+    Image:
+        size_hint_y: 0.4
+        source: root.image_source
+        allow_stretch: False
+   
+    Label:
+        markup:True
+        text: "[size=30]"+root.body_text + "[/size]"
+        valign: 'center'
+        halign: 'center'
+        text_size: self.size 
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.5
+        padding: 200, 0 ,200, 0 
+        Auto_Image_Label_Button:
+            button_text: "[size=30]" + root.button_text + "[/size]"
+            image_icon: root.button_image
+            background_normal: "Icons/Slicer wizard icons/button bkg active.png"
+            on_press: root.button_function()
 
 <Picture_Button_Screen_Body>:
     orientation: 'vertical'
@@ -3219,6 +3210,61 @@
                     halign: 'center'
                     text_size: self.size
                     max_lines: 2
+
+<Object_Modal_Question>:
+    orientation: 'vertical'
+    padding: 0,0,0,15
+    spacing: 15
+   
+    BoxLayout:
+        orientation:'vertical'
+        id:custom_object_box
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.333
+        spacing: 20  
+        padding: 75,0,75,0
+        Button:
+            id: first_button
+            on_press: root.option1_function()
+            background_normal: "Icons/blue_button_style.png"
+            BoxLayout:
+
+                orientation: 'horizontal'
+                
+                x: first_button.x
+                y: first_button.y
+                size: first_button.size  
+                
+                Label:
+                    id: ok_label
+                    markup:True
+                    text: "[size=30]" + root.option1_text
+                    valign: 'center'
+                    halign: 'center'
+                    text_size: self.size
+                    max_lines: 2
+        Button:
+            id: second_button
+            on_press: root.option2_function()
+            background_normal: "Icons/blue_button_style.png"
+            BoxLayout:
+
+                orientation: 'horizontal'
+                
+                x: second_button.x
+                y: second_button.y
+                size: second_button.size  
+
+                Label:
+                    id: ok_label
+                    markup:True
+                    text: "[size=30]" + root.option2_text
+                    valign: 'center'
+                    halign: 'center'
+                    text_size: self.size
+                    max_lines: 2
     
 <Picture_Instructions>:
     orientation: 'vertical'
@@ -3318,6 +3364,24 @@
         Image:
             source: 'Icons/Zoffset illustration/Too-low-front.png'
             allow_stretch: False
+
+<FTZO_Button>:
+    id: waldo_icon
+    Image:
+        id: icon
+        size: self.texture_size
+        source: root.icon_source
+        pos: waldo_icon.x + ((waldo_icon.width - icon.width) / 2), (label.y + label.height) + root.offset
+    Label:
+        id: label
+        size: self.texture_size
+        pos: waldo_icon.x + ((waldo_icon.width - label.width) / 2), waldo_icon.y + (waldo_icon.height / 6)
+        text: root.icon_text
+        font_size: 30
+        markup: True
+        max_lines: 2
+        halign: 'center'
+        valign: 'bottom'
             
 <Update_Offset>:
     id: screen
@@ -3326,9 +3390,11 @@
     padding: 0,0,0,15
     Label:
         size_hint_y: 0.7
+        size: self.size
+        text_size: self.size
         id: offset_text
         markup: True
-        text: '[size=27]' + app.root.lang.pack['FT_ZOffset_Wizard']['Test_Instructions'] + '[/size][size=40][color=#69B3E7]' + str(root.actual_offset) + '[/size]'
+        text: '[size=30]' + app.root.lang.pack['FT_ZOffset_Wizard']['Test_Instructions'] + '[/size]\n[size=40][color=#69B3E7]{0:.2f}'.format(root.actual_offset) + '[/size]'
         valign: 'middle'
         halign: 'center'
         
@@ -3338,77 +3404,35 @@
         padding: 20, 0, 20, 0
         size_hint_y: 0.7
 
-        Button:
+        FTZO_Button:
             id: toggle_mm
             background_normal: 'Icons/blue_button_style.png'
             on_press: root.toggle_mm_z()
-            Image:
-                id: toggle_icon
-                source: 'Icons/Manual_Control/increments_2_1.png'
-                size_hint: None, None
-                center_x: toggle_mm.center_x
-                center_y: toggle_mm.center_y + 20
-            Label:
-                id: toggle_label
-                text: root.s_toggle_mm[root.toggle_mm]
-                font_size: 30
-                size_hint: None, None
-                center_x: toggle_mm.center_x
-                center_y: toggle_mm.center_y - 25
-    
-        Button:
+            icon_text: root.s_toggle_mm[root.toggle_mm]
+            icon_source: root.i_toggle_mm[root.toggle_mm]
+            offset: 15
+           
+        FTZO_Button:
             id: z_plus
             background_normal: 'Icons/button_pause_blank.png'
             on_press: root.subtract_offset() 
-            Image:
-                source: 'Icons/Manual_Control/Z-_icon.png'
-                size_hint: None, None
-                center_x: z_plus.center_x
-                center_y: z_plus.center_y + 20
-            Label:
-                id: toggle_amount
-                text: app.root.lang.pack['FT_ZOffset_Wizard']['Bed_Down']
-                font_size: 30
-                size_hint: None, None
-                center_x: z_plus.center_x
-                center_y: z_plus.center_y - 25
-    
-        Button:
+            icon_text: app.root.lang.pack['FT_ZOffset_Wizard']['Bed_Down']
+            icon_source: 'Icons/Manual_Control/Z-_icon.png'
+          
+        FTZO_Button:
             id: z_minus
             background_normal: 'Icons/button_pause_blank.png'
             on_press: root.add_offset()
-            Image:
-                source: 'Icons/Manual_Control/Z+_icon.png'
-                size_hint: None, None
-                center_x: z_minus.center_x
-                center_y: z_minus.center_y + 20
-            Label:
-                id: toggle_amount
-                text: app.root.lang.pack['FT_ZOffset_Wizard']['Bed_Up']
-                font_size: 30
-                size_hint: None, None
-                center_x: z_minus.center_x
-                center_y: z_minus.center_y - 25
+            icon_text: app.root.lang.pack['FT_ZOffset_Wizard']['Bed_Up']
+            icon_source: 'Icons/Manual_Control/Z+_icon.png'
     
-        Button:
+        FTZO_Button:
             id: done
+            disabled: root.line_lock
             background_normal: 'Icons/blue_button_style.png'
             on_press: root.set_offset()
-            Image:
-                source: 'Icons/Manual_Control/ok_button_icon.png'
-                size_hint: None, None
-                center_x: done.center_x
-                center_y: done.center_y + 35
-            Label:
-                id: toggle_amount
-                text: app.root.lang.pack['FT_ZOffset_Wizard']['Test_Offset']
-                font_size: 30
-                valign: 'middle'
-                halign: 'center'
-                text_size: self.size
-                size_hint: None, None
-                center_x: done.center_x
-                center_y: done.center_y - 25
+            icon_text: app.root.lang.pack['FT_ZOffset_Wizard']['Test_Offset']
+            icon_source: 'Icons/Manual_Control/ok_button_icon.png' 
 
 
 <Wait_Screen>:
@@ -3425,6 +3449,154 @@
         valign: 'top'
         halign: 'center'
         text_size: self.size
+
+<Info_Screen>:
+    orientation: 'vertical'
+    Label:
+        text: "[size=40][color=#69B3E7]" + root.title
+        markup: True
+        text_size: self.size
+        texture_size: self.size
+        valign: "center"
+        halign: "center"
+
+    Label:
+        text: "[size=30]" + root.body
+        markup: True
+        text_size: self.size
+        texture_size: self.size
+        valign: "center"
+        halign: "center"
+
+#:import utils kivy.utils
+<PID_info_label@Label>:
+    id: pid_label
+    canvas.after:
+        Color:
+            rgba: utils.get_color_from_hex('#69B3E7')
+        Line:
+            cap: 'round'
+            joint: 'round'
+            close: True
+            width: 2
+            points: [pid_label.x, pid_label.y, pid_label.x, pid_label.y + pid_label.height, pid_label.x + pid_label.width, pid_label.y + pid_label.height, pid_label.x + pid_label.width, pid_label.y]
+    
+    padding: [15,0] if pid_label.halign == 'left' else [0,0] 
+    markup: True
+    text_size: self.size
+    valign: "center"
+    halign: "center"
+
+<PID_regular_info_label@Label>:
+    markup: True
+    size: self.texture_size
+    text_size: self.size
+    valign: "center"
+    halign: "center"
+
+<PID_Test_Screen>:
+    orientation: 'vertical'
+    padding: 10, 0, 10, 0
+
+    #title
+    PID_regular_info_label:
+        size_hint_y: 0.5
+        text: "[size=40][color=#69B3E7]" + root.title
+    #info
+    BoxLayout:
+        orientation: 'horizontal'     
+        #PID settings
+        BoxLayout:
+            #padding: (self.width * (1.0/3.0)), 0, 0, 0
+            id:pid_box
+            orientation:'vertical'
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['Original_PID']
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['P'] + str(root.P_original)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['I'] + str(root.I_original)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['D'] + str(root.D_original)
+                halign: "left"
+        BoxLayout:
+            #padding: (self.width * (1.0/3.0)), 0, 0, 0
+            orientation:'vertical'
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['Updated_PID']
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['P'] + str(root.P_text)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['I'] + str(root.I_text)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['D'] + str(root.D_text)
+                halign: "left"
+        BoxLayout:
+            orientation: 'vertical'
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['Actual'] + root.temperature_text + app.root.lang.pack['PID_Tool']['Workflow']['Target'] + root.target_text
+
+    #current test
+    PID_regular_info_label:
+        size_hint_y: 0.5
+        text: "[size=30]" + root.current_test_text
+
+<PID_Finish_Object>:
+    orientation:'vertical'
+    spacing: 15
+
+    #title
+    Label:
+        markup: True
+        size_hint_y: 0.8
+        text: "[size=35][color=#69B3E7]" + root.finished_text
+        size: self.size
+        text_size: self.size
+        valign: 'center'
+        halign: 'center'
+        max_lines: 2
+    BoxLayout:
+        orientation: 'horizontal'
+
+        BoxLayout:
+
+        BoxLayout:
+            orientation: 'vertical'
+            # PID_info_label:
+            #     text: root.table_text
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['P'] + str(root.P_text)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['I'] + str(root.I_text)
+                halign: "left"
+            PID_info_label:
+                text: app.root.lang.pack['PID_Tool']['Workflow']['D'] + str(root.D_text)
+                halign: "left"
+        BoxLayout:
+
+
+<Access_Control_QR_Code>:
+    orientation: 'vertical'
+    Image:
+        source: root.img_source
+        pos_hint: {'center_x': 0.5, 'center_y': 0.75}
+    Label:
+        size_hint_y: 0.5
+        markup: True
+        text: "[size=30]" + root.body_text
+        size: self.size
+        text_size: self.size
+        valign: "center"
+        halign: "center"
+
+
+
+
     
 <MainScreen>
     name: 'main'

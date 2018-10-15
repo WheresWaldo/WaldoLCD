@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-10-03 12:31:38
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 11:48:21
 from kivy.uix.button import Button
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty, BooleanProperty
 from kivy.uix.floatlayout import FloatLayout
@@ -20,7 +25,7 @@ import shutil
 import subprocess
 from scrollbox import Scroll_Box_Even
 from common_screens import Button_Group_Observer, OL_Button, Override_Layout
-from Preheat_Wizard import Preheat_Overseer
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
 
 USB_DIR = '/home/pi/.octoprint/uploads/USB'
 FILES_DIR = '/home/pi/.octoprint/uploads'
@@ -520,7 +525,7 @@ class Override_Page(object):
                     'fan_enabled': self._fans,
                     'fan_speed': 100 if self._fans else 0,
                     'fan_speed_max': 100 if self._fans else 0,
-                    'fan_full_height': 0.1 if self._fans else -1
+                    'fan_full_height': 6.0 if self._fans else -1
                     
                     }
         # add the brim settings to the override

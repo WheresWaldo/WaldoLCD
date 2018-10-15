@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-09-19 11:46:30
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:14:39
 # coding: UTF-8
 from .. import waldoprinter
 from kivy.uix.screenmanager import Screen

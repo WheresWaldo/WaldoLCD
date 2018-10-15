@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-07-14 17:04:43
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:13:49
 from common_screens import Modal_Question, Button_Screen, Title_Button_Screen
 from scrollbox import Scroll_Box_Even, Scroll_Box_Even_Button
 from functools import partial
@@ -31,16 +36,16 @@ class Change_Language():
         if action and language != None:
             self.old_language = lang.current_lang
             lang.reload_language(lang_option)
-            waldoprinter.printer_instance._settings.set(['Language'], lang_option)
-            waldoprinter.printer_instance._settings.save()
+            roboprinter.printer_instance._settings.set(['Language'], lang_option)
+            roboprinter.printer_instance._settings.save()
             
             layout = Language_Confirmation_Screen(language)
     
             title = lang.pack['Switch_Lang']['Confirmation']['Title'] + language
             name = 'confirm_language'
-            back_destination = waldoprinter.waldo_screen()
+            back_destination = roboprinter.robo_screen()
     
-            waldoprinter.back_screen(
+            roboprinter.back_screen(
                 name=name,
                 title=title,
                 back_destination=back_destination,
@@ -53,10 +58,10 @@ class Change_Language():
 
     def Monitor_Screen(self, dt):
 
-        if waldoprinter.waldosm.current != 'confirm_language':
+        if roboprinter.robosm.current != 'confirm_language':
             lang.reload_language(self.old_language)
-            waldoprinter.printer_instance._settings.set(['Language'], self.old_language)
-            waldoprinter.printer_instance._settings.save()
+            roboprinter.printer_instance._settings.set(['Language'], self.old_language)
+            roboprinter.printer_instance._settings.save()
             Logger.info("Switched Back to old language LC: " + str(self.old_language))
             return False
 
@@ -88,9 +93,9 @@ class Select_Language(Scroll_Box_Even):
             layout = Switch_Language(option, self.callback, language[option])
             title = lang.pack['Switch_Lang']['Choose']['Select'] + option + lang.pack['Switch_Lang']['Choose']['Question']
             name = 'yes_no_language'
-            back_destination = waldoprinter.waldo_screen()
+            back_destination = roboprinter.robo_screen()
     
-            waldoprinter.back_screen(
+            roboprinter.back_screen(
                 name=name,
                 title=title,
                 back_destination=back_destination,
@@ -135,13 +140,13 @@ class Switch_Language(Modal_Question):
 
     def Monitor_Screen(self, dt):
 
-        if waldoprinter.waldosm.current != 'select_language' and not self.pressed_yes:
+        if roboprinter.robosm.current != 'select_language' and not self.pressed_yes:
             lang.reload_language(self.old_language)
             Logger.info("Switched Back to old language LC: " + str(self.old_language))
             return False
 
 class Language_Confirmation_Screen(Button_Screen):
-    #self, body_text, button_function, button_text = waldoprinter.lang.pack['Button_Screen']['Default_Button'], **kwargs
+    #self, body_text, button_function, button_text = roboprinter.lang.pack['Button_Screen']['Default_Button'], **kwargs
 
     def __init__(self, language):
         self.body_text = lang.pack['Switch_Lang']['Confirmation']['Body1'] + language + lang.pack['Switch_Lang']['Confirmation']['Body2']
@@ -153,7 +158,7 @@ class Language_Confirmation_Screen(Button_Screen):
         super(Language_Confirmation_Screen, self).__init__(self.body_text, self.button_function, button_text=self.button_text)
 
     def restart(self):
-        subprocess.call('/home/pi/scripts/webcam stop & sudo pkill -9 octoprint & sudo service octoprint restart', shell=True)
+        subprocess.call('/home/pi/.octoprint/scripts/webcam stop & sudo pkill -9 octoprint & sudo service octoprint restart', shell=True)
 
 
 

@@ -13,8 +13,8 @@ class Install_Deps(object):
         import os
         import pip
         local_path = os.path.dirname(os.path.realpath(__file__))
-        r = pip.main(['install', '--upgrade', '--no-deps', '--force-reinstall',
-                      "https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip",
+        r = pip.main(['install', '--upgrade', '--no-deps',
+                      'https://github.com/OctoPrint/OctoPrint-FirmwareUpdater/archive/master.zip',
                      ])
         if r is not 0:
             print("Could not install WaldoLCD dependencies: OctoPrint_FirmwareUpdater")
@@ -55,20 +55,20 @@ plugin_package = "WaldoLCD"
 plugin_name = "WaldoLCD"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "1.10.1"
+plugin_version = "18.10.15"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
 plugin_description = """LCD screen for Printer"""
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
-plugin_author = "BH"
+plugin_author = "Matt Pedler & Victor E Fimbres & Peri Smith modded by BH"
 
 # The plugin's author's mail address.
-plugin_author_email = ""
+plugin_author_email = "Developer@robo3d.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/WheresWaldo/WaldoLCD"
+plugin_url = "https://github.com/WheresWaldo/roboLCD_current"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"

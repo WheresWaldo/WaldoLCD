@@ -1,10 +1,42 @@
-# WaldoLCD Changelog
+# RoboLCD Changelog
+# Change Log 18.10.15
 
-## 1.10.1.A
+### Rewrite 
+ - remove all references to Robo3D/RoboLCD
+ 
 
-### Improvements
+ # Change Log 1.11.0
 
-* Removed all dependencies that point back to Robo3D GITHUB
+### Major Changes
+ - Filament Change/Load, Z-Offset, and Fine Tune Z-Offset wizards changed to support dual extrusion
+ - The Preheat Wizard now has profiles for Dual Extrusion as well as profiles for single nozzles
+ - Motor Controls will now change the Extruder page if it is in dual extrusion mode
+ - Motor Controls will kill all heaters if the user backs out of the wizard.
+ - Z-Offset wizard will no longer reset the EEPROM every time it is set. It will reset M206 and M851 only
+ - Z-Offset will now put the nozzle closer to the bed, users no longer have to hit up many times
+ - If a user backs out of the Z-Offset wizard, their Z-Offset will be set back to what it was.
+ - All Wizards are put into their own folder and use a new type of Back Button that increases flow control for the programmer.
+ - All Wait screens will not call their callback functions if the user backs out. [Bug Fix]
+ - Added PID tuning wizard, This wizard can be used to tune any heater. 
+ - FTZO will wait to reach the nozzles target temperature before continuing with the wizard.
+ - FTZO has updated speeds so lines get put down faster
+ - FTZO will send the G36 command for setting up the printer
+ - FTZO has a new Circles mode that draws circles on the bed
+ - FTZO will now conform to the size of the bed set in Octoprint
+ - FTZO has a changed layout that allows more control over the process for the user.
+ - Updates will now use the new Robo Remote Update System to update.
+ - Update warning screen updated.
+ - Clickable update warning will appear in the error bar.
+
+
+### Minor Changes
+ - PConsole no longer uses the regular expression library to get values from the EEPROM. It now will disassemble the M Command into a dictionary of the values it finds
+ - PConsole has an Observer in it now that will allow programs to register callbacks when an EEPROM variable is updated.
+ - EEPROM will now show a custom edit range for each value. (Accelerations needs a +100 button but the Z-Offset does not.)
+ - Foundation for Dual Extrusion software
+ - PID tuner options can be changed with an edit of the loaded language pack. (Target temp, cycle count)
+ - Filament loading screen will turn off the heaters if it is backed out of unless the printer is printing.
+ - Wizards will now display "Loading..." when pressed.
 
 ## 1.10.1 (2017-9-28)
 
@@ -75,7 +107,7 @@
 
 ### Bug Fixes
 
-* Installation of WaldoLCD does not ignore the new onboard webcam option created in 1.8.0.
+* Installation of RoboLCD does not ignore the new onboard webcam option created in 1.8.0.
 
 ## 1.8.0 (2017-6-9)
 
@@ -242,7 +274,7 @@
 
 ###Improvements
 
-* Utilities-->Update is aware of any WaldoOS updates without the need to upgrade WaldoLCD source code
+* Utilities-->Update is aware of any RoboOS updates without the need to upgrade RoboLCD source code
 
 ##1.2.2 (2017-1-4)
 
@@ -386,7 +418,7 @@
 
 ### Bug Fixes
 
-* Kivy app dynamically becomes aware of /path/to/WaldoLCD/lcd/ . Fixes issue of hard-coded directory paths for custom .kv and Icons files, and kivy app's inability to find these files on different installation paths.
+* Kivy app dynamicaly becomes aware of /path/to/RoboLCD/lcd/ . Fixes issue of hardcoded directory paths for custom .kv and Icons files, and kivy app's inability to find these files on different installation paths.
 
 ##0.1.0 (2016-08-05)
 

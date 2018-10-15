@@ -1,5 +1,9 @@
-from kivy.graphics import *
-from .. import waldoprinter
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-07-14 12:42:48
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:14:41
+from WaldoLCD import waldoprinter
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from pconsole import pconsole
@@ -7,6 +11,7 @@ from kivy.uix.modalview import ModalView
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.logger import Logger
 from functools import partial
+
 
 class Updating_Popup(ModalView) :
     pass
@@ -30,6 +35,11 @@ class Zoffset_Warning_Popup(ModalView):
     def start_print_button(self, **kwargs):
         self.dismiss()
         self.file_printer.force_start_print()
+
+    def generate_z_offset_wizard(self, *args, **kwargs):
+        from WaldoLCD.lcd.wizards.wizard_overseer import Wizards
+        wiz = Wizards(soft_load=True, back_destination='main')
+        wiz.load_wizard(generator='ZOFFSET', name=waldoprinter.lang.pack['WaldoIcons']['Z_Offset'])
 
 class Update_Warning_Popup(ModalView):
     """docstring for Zoffset_Warning_Popup(ModalView)"""

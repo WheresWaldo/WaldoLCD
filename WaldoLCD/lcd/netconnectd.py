@@ -1,5 +1,11 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-05-12 10:16:15
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:14:18
 import socket
 from kivy.logger import Logger
+
 
 class NetconnectdClient():
     address = '/var/run/netconnectd.sock'

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler
+# @Date:   2017-10-13 15:38:27
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 11:17:40
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
@@ -183,23 +188,54 @@ class Temperature_Operator(Button):
     background_normal = StringProperty('')
     button_text = StringProperty('')
     temp_text = StringProperty('')
+    heater_title = StringProperty('')
 
     def __init__(self, button_function, selected_extruder, background_normal):
         super(Temperature_Operator, self).__init__()
         self.button_function = button_function
         self.selected_extruder = selected_extruder
         self.background_normal = background_normal
+        self.settings = waldoprinter.printer_instance._settings
+        self.waldo_state = self.get_state()
         self.change_extruder(self.selected_extruder)
+        self.heater_not_found = False
         Clock.schedule_interval(self.monitor_selected_temp, 0.2)
+
+    def get_state(self):
+        profile = self.settings.global_get(['printerProfiles', 'defaultProfile'])
+
+        if 'extruder' in profile:
+            extruder_count = int(profile['extruder']['count'])
+        else:
+            extruder_count = 1
+
+        #re-enable this code when Dual extrusion is ready for release
+        extruder_count = 1
+
+        model = self.settings.get(['Model'])
+
+        return {'model': model,
+                'extruder': extruder_count}
+        
     
     def change_extruder(self, extruder):
-        acceptable_extruders = {
-            'tool0': lang.pack['Temperature_Controls']["Extruder_1"],
-            'tool1': lang.pack['Temperature_Controls']["Extruder_2"]
-        }
+        self.heater_not_found = False
+        #get the state of the machine. If we only have one extruder we should just say "Extruder". if more than one "Extruder 1" and 2
+        if 'extruder' in self.waldo_state and int(self.waldo_state['extruder']) == 1:
+            acceptable_extruders = {
+                'tool0': lang.pack['Temperature_Controls']["Extruder"]
+            }
+        else:
+            acceptable_extruders = {
+                'tool0': lang.pack['Temperature_Controls']["Extruder_1"],
+                'tool1': lang.pack['Temperature_Controls']["Extruder_2"]
+            }
         if extruder in acceptable_extruders:
             self.selected_extruder = extruder
+            #button text sets the text of the button
             self.button_text = acceptable_extruders[extruder]
+            #heater title sets the title of the next screen
+            self.heater_title = acceptable_extruders[extruder]
         else:
             raise ValueError("Use tool0 or tool1")
 
@@ -216,8 +252,19 @@ class Temperature_Operator(Button):
         temps  = waldoprinter.printer_instance._printer.get_current_temperatures()
         current_temperature = [0,0]
 
-        if 'actual' in temps[extruder] and 'target' in temps[extruder]:
-            current_temperature = [int(temps[extruder]['actual']), int(temps[extruder]['target'])]
+        if extruder in temps and 'actual' in temps[extruder] and 'target' in temps[extruder]:
+            #check if temperature can be turned to int
+            try:
+                current_temperature = [int(temps[extruder]['actual']), int(temps[extruder]['target'])]
+            except Exception as e:
+                if not self.heater_not_found:
+                    Info_Popup(lang.pack['Warning']['Heater_Not_Found'], lang.pack['Warning']['Heater_Not_Found_Body']).show()
+                    self.heater_not_found = True
+            
+        else:
+            if not self.heater_not_found:
+                Info_Popup(lang.pack['Warning']['Heater_Not_Found'], lang.pack['Warning']['Heater_Not_Found_Body']).show()
+                self.heater_not_found = True
         
         return current_temperature
 
@@ -249,8 +296,9 @@ class Dual_Extruder_Movement(MotorControl):
         extrude = Motor_Control_Operator(self.move.move_pos, 'e', 'Icons/button_pause_blank.png', 'Icons/Manual_Control/extrude_icon.png', lang.pack['Motor_Controls']['Extrude'])
         self.temp_controls = Temperature_Operator(waldoprinter.waldosm.generate_temperature_controls, 'tool0', 'Icons/blue_button_style.png')
         # body_text, image_source, button_function, enabled = True, observer_group = None, **kwargs
-        ext_1 = OL_Button(lang.pack['Temperature_Controls']["Extruder_1"], 'Icons/System_Icons/Extruder1.png', self.change_tool_ext1, enabled=True, observer_group=tool_observer)
-        ext_2 = OL_Button(lang.pack['Temperature_Controls']["Extruder_2"], 'Icons/System_Icons/Extruder2.png', self.change_tool_ext2, enabled=False, observer_group=tool_observer)
+        self.change_tool_ext1(0)
+        ext_1 = OL_Button(lang.pack['Temperature_Controls']["Extruder_1"], ['Icons/Heater_Icons/Print head 1.png','Icons/Heater_Icons/Print head 1 selected.png'], self.change_tool_ext1, enabled=True, observer_group=tool_observer)
+        ext_2 = OL_Button(lang.pack['Temperature_Controls']["Extruder_2"], ['Icons/Heater_Icons/Print head 2.png','Icons/Heater_Icons/Print head 2 selected.png'], self.change_tool_ext2, enabled=False, observer_group=tool_observer)
 
         button_list = [toggle_mm, retract, ext_1, self.temp_controls, extrude, ext_2]
 
@@ -258,11 +306,13 @@ class Dual_Extruder_Movement(MotorControl):
 
     #value will come back true or false with no information
     def change_tool_ext1(self, value):
+        Logger.info("Selecting tool0")
         self.temp_controls.change_extruder('tool0')
         waldoprinter.printer_instance._printer.change_tool('tool0')
         self.move.selected_tool = 'tool0'
 
     def change_tool_ext2(self, value):
+        Logger.info("Selecting tool1")
         self.temp_controls.change_extruder('tool1')
         waldoprinter.printer_instance._printer.change_tool('tool1')
         self.move.selected_tool = 'tool1'
@@ -275,23 +325,31 @@ class Mover():
     def __init__(self, parent):
         self.parent = parent
         self.selected_tool = 'tool0'
+        self.warning_shown = False
 
     def temperature(self):
         temps  = waldoprinter.printer_instance._printer.get_current_temperatures()
-        current_temperature = ''
-        current_temperature = int(temps[self.selected_tool]['actual'])
-        
+        current_temperature = 0.00
+        if self.selected_tool in temps:
+            current_temperature = int(temps[self.selected_tool]['actual'])
+        else:
+            if not self.warning_shown:
+                Info_Popup(lang.pack['Warning']['Heater_Not_Found'], lang.pack['Warning']['Heater_Not_Found_Body']).show()
+                self.warning_shown = True
+                    
         return current_temperature
 
     def move_pos(self, axis):
         if axis == 'e' and self.temperature() < 175:
             Info_Popup(lang.pack['Warning']['Mintemp'], str(self.temperature()) + lang.pack['Warning']['Mintemp_Body']).show()
+            self.warning_shown = False
         else:
             self._move(axis, self.parent.movement_mm)
 
     def move_neg(self, axis):
         if axis == 'e' and self.temperature() < 175:
             Info_Popup(lang.pack['Warning']['Mintemp'], str(self.temperature()) + lang.pack['Warning']['Mintemp_Body']).show()
+            self.warning_shown = False
         else:
             self._move(axis, -self.parent.movement_mm)
 

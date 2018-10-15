@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Matt Pedler modded by BH
+# @Date:   2017-09-29 15:08:31
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 23:59:59
 # coding=utf-8
 from __future__ import absolute_import
 import octoprint.plugin
@@ -14,6 +19,8 @@ from .lcd.session_saver import session_saver
 import os
 from .lcd.Language import lang
 import time
+import flask
+import json
 
 
 
@@ -21,12 +28,27 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
                     octoprint.plugin.AssetPlugin,
                     octoprint.plugin.StartupPlugin,
                     octoprint.plugin.EventHandlerPlugin,
+                    octoprint.plugin.BlueprintPlugin
                     ):
 
     def __init__(self, **kwargs):
         super(WaldolcdPlugin, self).__init__(**kwargs)
         self.lcd_thread = None
         self.file_lock = False
+
+    @octoprint.plugin.BlueprintPlugin.route("/usb_status", methods=['GET'])
+    def get_usb_status(self):
+        
+        usb_status = None
+        if 'usb_status' in session_saver.saved and callable(session_saver.saved['usb_status']):
+            usb_status = session_saver.saved['usb_status']()
+
+        #if we did not get the USB status return an error
+        if usb_status == None:
+            return flask.make_response("Error. Could not retrieve usb function", 500)
+        else:
+            return flask.make_response(json.dumps(usb_status), 200)
+
 
 
     def get_settings_defaults(self):
@@ -35,9 +57,10 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
             Model = None,
             Language = None,
             Temp_Preset = {},
+            Dual_Temp_Preset = {},
             sorting_config = {}
 
-            )
+            )    
 
     def _get_api_key(self):
         return self._settings.global_get(['api', 'key'])
@@ -48,16 +71,16 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
         img.save('{}/{}'.format(folder, 'qr_code.png'))
 
     def on_after_startup(self):
-        
+            
         lang_pack = self._settings.get(['Language'])
         self._logger.info("Loading Language Pack " + str(lang_pack))
         lang.load_language(lang_pack)
 
         passing = lang.pack['Load_Success']['pass']
         self._logger.info("Loading Success? " + str(passing) + " ######################################")
-        waldoprinter.lang = lang
+        roboprinter.lang = lang
 
-
+        
 
         self._logger.info("WaldoLCD Starting up")
         # saves the printer instance so that it can be accessed by other modules
@@ -115,7 +138,6 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
             self._logger.info("Meta Reader does not have helper Functions")
             self.start_analysis = self.updater_placeholder
             self.collect_data = self.updater_placeholder
-
         #get helper from Filament runout sensor
         filament_helpers = self._plugin_manager.get_helpers("filament", "check_auto_pause")
         self.check_auto_pause = None
@@ -127,6 +149,11 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
         else:
             self._logger.info("Filament Helpers DO NOT Exist ###########################")
             self._logger.info(str(filament_helpers))
+
+    def restart_screen(self):
+        self.lcd_thread = threading.Thread(target=lcd.start, args=())
+        self.lcd_thread.start()
+        self._logger.info("Rendering screen... ")
             
 
     def on_event(self,event, payload):

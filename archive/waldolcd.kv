@@ -4,7 +4,6 @@
         tab_width: root.width / 3
         tab_height: root.height / 4
         background_color: (0,1,0,1)
-
         FloatLayout:
             FilesContent:
                 id: filescontent
@@ -15,24 +14,21 @@
             SettingsContent:
                 id: settingscontent
                 text: "Settings list!"
-
-		FilesTab:
+        FilesTab:
             text: "\n\n\n\nFiles"
             content: filescontent.__self__
             Image:
                 source: "icons/files.png"
                 pos: (self.parent.width/2) - 50, (self.parent.height/2.5)
                 allow_stretch: True
-
-		PrinterStatusTab:
+        PrinterStatusTab:
             text: "\n\n\n\nPrinter"
             content: printerstatuscontent.__self__
             Image:
                 source: "icons/printer.png"
                 pos: self.parent.width+215, (self.parent.height/2.5)
                 allow_stretch: True
-
-		SettingsTab:
+        SettingsTab:
             text: "\n\n\n\nSettings"
             content: settingscontent.__self__
             Image:

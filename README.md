@@ -1,8 +1,45 @@
-# Change Log 1.10.1.A
+# Change Log 18.10.15
+### Rewrite 
+ - remove all references to Robo3D/RoboLCD
+ 
+ 
+# Change Log 1.11.0
 
 ### Major Changes
- - Removed all dependencies that point back to Robo3D GITHUB
- - Renamed the plugin
+ - Filament Change/Load, Z-Offset, and Fine Tune Z-Offset wizards changed to support dual extrusion
+ - The Preheat Wizard now has profiles for Dual Extrusion as well as profiles for single nozzles
+ - Motor Controls will now change the Extruder page if it is in dual extrusion mode
+ - Motor Controls will kill all heaters if the user backs out of the wizard.
+ - Z-Offset wizard will no longer reset the EEPROM every time it is set. It will reset M206 and M851 only
+ - Z-Offset will now put the nozzle closer to the bed, users no longer have to hit up many times
+ - If a user backs out of the Z-Offset wizard, their Z-Offset will be set back to what it was.
+ - All Wizards are put into their own folder and use a new type of Back Button that increases flow control for the programmer.
+ - All Wait screens will not call their callback functions if the user backs out. [Bug Fix]
+ - Added PID tuning wizard, This wizard can be used to tune any heater. 
+ - FTZO will wait to reach the nozzles target temperature before continuing with the wizard.
+ - FTZO has updated speeds so lines get put down faster
+ - FTZO will send the G36 command for setting up the printer
+ - FTZO has a new Circles mode that draws circles on the bed
+ - FTZO will now conform to the size of the bed set in Octoprint
+ - FTZO has a changed layout that allows more control over the process for the user.
+ - Wifi password obfuscation
+ - QR code obfuscation for access control
+
+
+### Minor Changes
+ - PConsole no longer uses the regular expression library to get values from the EEPROM. It now will disassemble the M Command into a dictionary of the values it finds
+ - PConsole has an Observer in it now that will allow programs to register callbacks when an EEPROM variable is updated.
+ - EEPROM will now show a custom edit range for each value. (Accelerations needs a +100 button but the Z-Offset does not.)
+ - Foundation for Dual Extrusion software
+ - PID tuner options can be changed with an edit of the loaded language pack. (Target temp, cycle count)
+ - Filament loading screen will turn off the heaters if it is backed out of unless the printer is printing.
+ - Wizards will now display "Loading..." when pressed.
+ - Added a timeout to the update system
+ - Added the "depth" tag to the update system so update packages do not download the repository .git folder. This results in very small packages to download
+ - Disabled EEPROM during print to avoid a bed crash.
+ - USB will now warn the user if the USB drive is unsupported or unmounted
+ - Moved Z-Offset capture point to X8.00 Y30.00
+ 
 
 # Change Log 1.10.0
 
@@ -17,6 +54,7 @@
     - USB and Local Files will now show their Used / Total Space on the drive.
     - Meta Data will load when a file is selected for the first time. Then it will be saved for future use
     - Browsing Files is now faster
+
 ### Minor Changes
  - Octoprint
     - Changed FileSystem to load Hex Files correctly on the Web Dash
