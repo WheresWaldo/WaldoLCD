@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-20 12:29:26
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-29 17:05:11
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.scrollbox import Scroll_Box_Icons, Robo_Icons
-from RoboLCD.lcd.wizards.zoffset.z_offset_wizard import ZoffsetWizard
-from RoboLCD.lcd.wizards.filament_wizard.filament_wizard import FilamentWizard
-from RoboLCD.lcd.wizards.FTZO.fine_tune_zoffset import Fine_Tune_ZOffset
-from RoboLCD.lcd.wizards.bed_calibration.bed_calibration_wizard import Bed_Calibration
-from RoboLCD.lcd.wizards.PID_Autotune.PID_Overseer import PID_Overseer
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 17:05:11
+#WaldoLCD
+
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Icons, Waldo_Icons
+from WaldoLCD.lcd.wizards.zoffset.z_offset_wizard import ZoffsetWizard
+from WaldoLCD.lcd.wizards.filament_wizard.filament_wizard import FilamentWizard
+from WaldoLCD.lcd.wizards.FTZO.fine_tune_zoffset import Fine_Tune_ZOffset
+from WaldoLCD.lcd.wizards.bed_calibration.bed_calibration_wizard import Bed_Calibration
+from WaldoLCD.lcd.wizards.PID_Autotune.PID_Overseer import PID_Overseer
 from wizard_bb import Wizard_BB
 
 #kivy
@@ -38,27 +39,27 @@ class Wizards(object):
         
         self.acceptable_wizards={#Wizards sub screen
                                 'ZOFFSET': {'name':'zoffset', 
-                                      'title':roboprinter.lang.pack['Utilities']['ZOffset'], 
+                                      'title':waldoprinter.lang.pack['Utilities']['ZOffset'], 
                                       'back_destination': back_destination, 
                                       'function': self.generate_zoffset_wizard},
                         
                                 'FIL_LOAD': {'name':'filamentwizard',
-                                       'title':roboprinter.lang.pack['Utilities']['Filament'],
+                                       'title':waldoprinter.lang.pack['Utilities']['Filament'],
                                        'back_destination':back_destination, 
                                        'function': self.generate_filament_wizard},
                         
                                 'FIL_CHANGE': {'name':'filamentwizard',
-                                        'title':roboprinter.lang.pack['Utilities']['Filament'],
+                                        'title':waldoprinter.lang.pack['Utilities']['Filament'],
                                         'back_destination':back_destination, 
                                         'function': self.generate_filament_change_wizard},
                         
                                 'FINE_TUNE':{'name': 'fine_tune_wizard', 
-                                       'title': roboprinter.lang.pack['Utilities']['FT_Wizard'], 
+                                       'title': waldoprinter.lang.pack['Utilities']['FT_Wizard'], 
                                        'back_destination': back_destination, 
                                        'function': self.fine_tune_wizard},
                         
                                 'BED_CALIBRATION':{'name': 'bed_calibration', 
-                                          'title': roboprinter.lang.pack['Utilities']['Bed_Cal'], 
+                                          'title': waldoprinter.lang.pack['Utilities']['Bed_Cal'], 
                                           'back_destination': back_destination, 
                                           'function': self.bed_calibration},
                                 'PID_TUNE': {'name': 'pid_tune',
@@ -69,7 +70,7 @@ class Wizards(object):
                                             }
                                 }
 
-        self.settings = roboprinter.printer_instance._settings
+        self.settings = waldoprinter.printer_instance._settings
 
         #grab the current state of the machine
         self.state = self.get_state()
@@ -101,12 +102,12 @@ class Wizards(object):
         title = kwargs['title']
         back_destination = kwargs['back_destination']
         
-        z = Robo_Icons('Icons/Zoffset illustration/Z-offset.png', roboprinter.lang.pack['RoboIcons']['Z_Offset'], 'ZOFFSET', callback = self.load_wizard)
-        fl = Robo_Icons('Icons/Icon_Buttons/Load Filament.png', roboprinter.lang.pack['RoboIcons']['Fil_Load'], 'FIL_LOAD', callback = self.load_wizard)
-        fc = Robo_Icons('Icons/Icon_Buttons/Change Filament.png', roboprinter.lang.pack['RoboIcons']['Fil_Change'], 'FIL_CHANGE', callback = self.load_wizard)
-        fine_tune = Robo_Icons('Icons/Zoffset illustration/Fine tune.png', roboprinter.lang.pack['RoboIcons']['FTZ_Offset'], 'FINE_TUNE', callback = self.load_wizard)
-        pid_tune = Robo_Icons('Icons/Icon_Buttons/PID.png', "PID Tuner" , 'PID_TUNE', callback = self.load_wizard)
-        bed_calib = Robo_Icons('Icons/Bed_Calibration/Bed placement.png', roboprinter.lang.pack['RoboIcons']['Bed_Cal'], 'BED_CALIBRATION', callback = self.load_wizard)
+        z = Waldo_Icons('Icons/Zoffset illustration/Z-offset.png', waldoprinter.lang.pack['WaldoIcons']['Z_Offset'], 'ZOFFSET', callback = self.load_wizard)
+        fl = Waldo_Icons('Icons/Icon_Buttons/Load Filament.png', waldoprinter.lang.pack['WaldoIcons']['Fil_Load'], 'FIL_LOAD', callback = self.load_wizard)
+        fc = Waldo_Icons('Icons/Icon_Buttons/Change Filament.png', waldoprinter.lang.pack['WaldoIcons']['Fil_Change'], 'FIL_CHANGE', callback = self.load_wizard)
+        fine_tune = Waldo_Icons('Icons/Zoffset illustration/Fine tune.png', waldoprinter.lang.pack['WaldoIcons']['FTZ_Offset'], 'FINE_TUNE', callback = self.load_wizard)
+        pid_tune = Waldo_Icons('Icons/Icon_Buttons/PID.png', "PID Tuner" , 'PID_TUNE', callback = self.load_wizard)
+        bed_calib = Waldo_Icons('Icons/Bed_Calibration/Bed placement.png', waldoprinter.lang.pack['WaldoIcons']['Bed_Cal'], 'BED_CALIBRATION', callback = self.load_wizard)
     
         #If it's not an R2 we dont need the bed calibration wizard
         if self.state['model'] == "Robo R2":
@@ -115,7 +116,7 @@ class Wizards(object):
         else:
           buttons = [fc, fl, z, fine_tune, pid_tune]
     
-        current_data = roboprinter.printer_instance._printer.get_current_data()
+        current_data = waldoprinter.printer_instance._printer.get_current_data()
         is_printing = current_data['state']['flags']['printing']
         is_paused = current_data['state']['flags']['paused']
         if is_printing or is_paused:
@@ -129,7 +130,7 @@ class Wizards(object):
 
         c = Scroll_Box_Icons(buttons)
     
-        roboprinter.robosm._generate_backbutton_screen(name=name, title=title, back_destination=back_destination, content=c)
+        waldoprinter.waldosm._generate_backbutton_screen(name=name, title=title, back_destination=back_destination, content=c)
 
     def load_wizard(self, generator = '', name = '', **kwargs):
         wizard = generator
@@ -168,9 +169,9 @@ class Wizards(object):
         # Check the debug state. If true, print out a list of instances of
         # Fine_Tune_ZOffset recognized by the garbage collector
         import gc
-        from RoboLCD.lcd.wizards.FTZO.fine_tune_zoffset import Fine_Tune_ZOffset
-        from RoboLCD.lcd.wizards.FTZO.FTZO_workflow import FTZO_workflow
-        from RoboLCD.lcd.wizards.FTZO.FTZO_screens import Update_Offset, Picture_Instructions, FTZO_Button, FTZO_Options, Z_offset_saver 
+        from WaldoLCD.lcd.wizards.FTZO.fine_tune_zoffset import Fine_Tune_ZOffset
+        from WaldoLCD.lcd.wizards.FTZO.FTZO_workflow import FTZO_workflow
+        from WaldoLCD.lcd.wizards.FTZO.FTZO_screens import Update_Offset, Picture_Instructions, FTZO_Button, FTZO_Options, Z_offset_saver 
 
         
         Logger.info("---> Checking Fine_Tune_ZOffset instances")

@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-12-07 16:45:53
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-27 15:51:00
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:51:00
+
 from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.common_screens import Button_Group_Observer, OL_Button, Quad_Icon_Layout, Button_Screen, Picture_Button_Screen, Modal_Question, Wait_Screen, Point_Layout
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.common_screens import Button_Group_Observer, OL_Button, Quad_Icon_Layout, Button_Screen, Picture_Button_Screen, Modal_Question, Wait_Screen, Point_Layout
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
 
 #Python
 from functools import partial

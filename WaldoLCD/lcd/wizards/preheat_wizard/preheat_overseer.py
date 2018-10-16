@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-05 12:09:21
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-31 12:08:24
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 12:08:24
 
 
 #kivy
@@ -16,18 +16,18 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.logger import Logger
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.connection_popup import Info_Popup, Error_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.connection_popup import Info_Popup, Error_Popup
 
-from RoboLCD.lcd.wizards.preheat_wizard.option_view import Option_View
-from RoboLCD.lcd.wizards.preheat_wizard.preheat import Preheat
+from WaldoLCD.lcd.wizards.preheat_wizard.option_view import Option_View
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat import Preheat
 
 #Python
 from functools import partial
@@ -39,7 +39,7 @@ import gc
 class Preheat_Overseer(object):
     dual = False
     def __init__(self, end_point=None, dual = False, back_button_screen = None, group=None, **kwargs):
-        self.model = roboprinter.printer_instance._settings.get(['Model'])
+        self.model = waldoprinter.printer_instance._settings.get(['Model'])
         self._name = kwargs['name']
         self.title = kwargs['title']
         self.back_destination = kwargs['back_destination']
@@ -78,7 +78,7 @@ class Preheat_Overseer(object):
 
     #This will create the preheat selection screen.
     def show_preheat_selection_screen(self,*args, **kwargs):
-        acceptable_selections = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+        acceptable_selections = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
         #populate with some default values if acceptable_selections == 0
         Logger.info("selection count = " + str(len(acceptable_selections)))
         if len(acceptable_selections) == 0:
@@ -89,7 +89,7 @@ class Preheat_Overseer(object):
 
         if self.bb == None:
             self.c = Preheat(self.switch_to_preheat)
-            roboprinter.robosm._generate_backbutton_screen(name=self._name,
+            waldoprinter.waldosm._generate_backbutton_screen(name=self._name,
                                                            title=self.title ,
                                                            back_destination=self.back_destination,
                                                            content=self.c,
@@ -125,11 +125,11 @@ class Preheat_Overseer(object):
         }
 
         #save default selection
-        roboprinter.printer_instance._settings.set(['Temp_Preset'], default_selections)
-        roboprinter.printer_instance._settings.save()
+        waldoprinter.printer_instance._settings.set(['Temp_Preset'], default_selections)
+        waldoprinter.printer_instance._settings.save()
 
     def show_dual_preheat_selection_screen(self, *args, **kwargs):
-        acceptable_dual_selections = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+        acceptable_dual_selections = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
         #populate with some default values if acceptable_selections == 0
         Logger.info("selection count = " + str(len(acceptable_dual_selections)))
         if len(acceptable_dual_selections) == 0:
@@ -140,9 +140,9 @@ class Preheat_Overseer(object):
 
             self.c = Preheat(self.switch_to_preheat, dual=True)
 
-            roboprinter.robosm._generate_backbutton_screen(name=self._name,
+            waldoprinter.waldosm._generate_backbutton_screen(name=self._name,
                                                            title=self.title ,
-                                                           back_destination=roboprinter.robosm.current,
+                                                           back_destination=waldoprinter.waldosm.current,
                                                            content=self.c,
                                                            cta=self.create_preset,
                                                            icon='Icons/Preheat/add_preset.png',
@@ -181,8 +181,8 @@ class Preheat_Overseer(object):
         }
 
         #save dual defaults
-        roboprinter.printer_instance._settings.set(['Dual_Temp_Preset'], dual_default_selections)
-        roboprinter.printer_instance._settings.save()
+        waldoprinter.printer_instance._settings.set(['Dual_Temp_Preset'], dual_default_selections)
+        waldoprinter.printer_instance._settings.save()
 
     #This is a callback for the preheat selection screen. This gets called when a user clicks on a preheat option
     def switch_to_preheat(self, value, option):
@@ -190,14 +190,14 @@ class Preheat_Overseer(object):
 
         Logger.info("Dual is set to: " + str(self.dual))
         if self.dual:
-            acceptable_selections = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+            acceptable_selections = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
             #make sure the selection is a valid selection from the dictionary
             if option in acceptable_selections:
                 self.generate_dual_option(option, acceptable_selections[option])
             else:
                 Logger.info("Not an acceptable selection from dictionary: " + option)
         else:
-            acceptable_selections = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+            acceptable_selections = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
             #make sure the selection is a valid selection from the dictionary
             if option in acceptable_selections:
                 self.generate_single_option(option, acceptable_selections[option])
@@ -233,7 +233,7 @@ class Preheat_Overseer(object):
 
         #make screen
         if self.bb == None:
-            self.bb_screen = roboprinter.robosm._generate_backbutton_screen(name='view_preheat',
+            self.bb_screen = waldoprinter.waldosm._generate_backbutton_screen(name='view_preheat',
                                                            title = lang.pack['Preheat']['Edit_Preset']['Select_Preset'] ,
                                                            back_destination=self._name,
                                                            content=modal_screen,
@@ -271,7 +271,7 @@ class Preheat_Overseer(object):
 
         #make screen
         if self.bb == None:
-            roboprinter.robosm._generate_backbutton_screen(name='view_preheat',
+            waldoprinter.waldosm._generate_backbutton_screen(name='view_preheat',
                                                            title = lang.pack['Preheat']['Edit_Preset']['Select_Preset'] ,
                                                            back_destination=self._name,
                                                            content=modal_screen,
@@ -294,18 +294,18 @@ class Preheat_Overseer(object):
         if self.end_point == None:
 
             if type(extruder) != list:
-                roboprinter.printer_instance._printer.set_temperature('tool0', float(extruder))
-                roboprinter.printer_instance._printer.set_temperature('bed', float(bed))
+                waldoprinter.printer_instance._printer.set_temperature('tool0', float(extruder))
+                waldoprinter.printer_instance._printer.set_temperature('bed', float(bed))
                 Logger.info("Set temperature to extruder: " + str(extruder) + " set temp to bed: " + str(bed))
                 session_saver.saved['Move_Tools']('TEMP')
-                roboprinter.robosm.go_back_to_main('printer_status_tab')
+                waldoprinter.waldosm.go_back_to_main('printer_status_tab')
             else:
-                roboprinter.printer_instance._printer.set_temperature('tool0', float(extruder[0]))
-                roboprinter.printer_instance._printer.set_temperature('tool1', float(extruder[1]))
-                roboprinter.printer_instance._printer.set_temperature('bed', float(bed))
+                waldoprinter.printer_instance._printer.set_temperature('tool0', float(extruder[0]))
+                waldoprinter.printer_instance._printer.set_temperature('tool1', float(extruder[1]))
+                waldoprinter.printer_instance._printer.set_temperature('bed', float(bed))
                 Logger.info("Set temperature to extruder1: " + str(extruder[0]) + " extruder2: " + str(extruder[1]) + " set temp to bed: " + str(bed))
                 session_saver.saved['Move_Tools']('TEMP')
-                roboprinter.robosm.go_back_to_main('printer_status_tab')
+                waldoprinter.waldosm.go_back_to_main('printer_status_tab')
         else:
             self.end_point(extruder, bed)
 
@@ -323,10 +323,10 @@ class Preheat_Overseer(object):
                               dual = self.dual,
                               callback = self.switch_to_preheat,
                               delete_callback = delete_callback,
-                              back_destination = roboprinter.robosm.current)
-            roboprinter.robosm._generate_backbutton_screen(name='edit_preheat',
+                              back_destination = waldoprinter.waldosm.current)
+            waldoprinter.waldosm._generate_backbutton_screen(name='edit_preheat',
                                                            title = lang.pack['Preheat']['Edit_Preset']['Title'] ,
-                                                           back_destination=roboprinter.robosm.current,
+                                                           back_destination=waldoprinter.waldosm.current,
                                                            content=content)
         else:
             Logger.info("Making Option_View with group: " + str(self.group))
@@ -334,7 +334,7 @@ class Preheat_Overseer(object):
                               dual=self.dual,
                               callback = self.switch_to_preheat,
                               delete_callback = delete_callback,
-                              back_destination = roboprinter.robosm.current,
+                              back_destination = waldoprinter.waldosm.current,
                               back_button_screen=self.bb,
                               group=self.group)
             self.bb.make_screen(content,
@@ -353,9 +353,9 @@ class Preheat_Overseer(object):
         if self.bb == None:
             content = Option_View(callback = callback,
                                   dual=self.dual)
-            roboprinter.robosm._generate_backbutton_screen(name='edit_preheat',
+            waldoprinter.waldosm._generate_backbutton_screen(name='edit_preheat',
                                                            title = lang.pack['Preheat']['Edit_Preset']['Add_Material'] ,
-                                                           back_destination=roboprinter.robosm.current,
+                                                           back_destination=waldoprinter.waldosm.current,
                                                            content=content)
         else:
             content = Option_View(callback = callback,

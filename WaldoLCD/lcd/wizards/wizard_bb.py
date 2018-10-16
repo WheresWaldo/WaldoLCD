@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-16 15:04:49
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 15:58:54
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:58:54
 
 #Kivy
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.logger import Logger
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.file_system.file_back_button import File_BB
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.file_system.file_back_button import File_BB
 
 #python
 import copy
@@ -25,16 +25,16 @@ class Wizard_BB(File_BB):
         self.group_dictionary = {}
         self.screen = None
         self.name="Wizard_BB"
-        self.back_destination = roboprinter.robosm.current
+        self.back_destination = waldoprinter.waldosm.current
         self.delete_same_name_screens()
 
     def delete_same_name_screens(self):
-        for s in roboprinter.robosm.screen_names:
+        for s in waldoprinter.waldosm.screen_names:
             if s is self.name:
-                d = roboprinter.robosm.get_screen(s)
-                roboprinter.robosm.remove_widget(d)
+                d = waldoprinter.waldosm.get_screen(s)
+                waldoprinter.waldosm.remove_widget(d)
                 Logger.info("Removed Duplicate Screen: " + s)
-                for s in roboprinter.robosm.screen_names:
+                for s in waldoprinter.waldosm.screen_names:
                     Logger.info(str(s))
         
     
@@ -66,8 +66,8 @@ class Wizard_BB(File_BB):
         self.screen = Screen_Node(screen=current_screen, prev_screen=self.screen)
 
         #check to see that we are the current screen if we are not then make us the current screen
-        if roboprinter.robosm.current != self.name:
-            roboprinter.robosm.current = self.name
+        if waldoprinter.waldosm.current != self.name:
+            waldoprinter.waldosm.current = self.name
 
 
     def back_function_flow(self,**kwargs):
@@ -95,11 +95,11 @@ class Wizard_BB(File_BB):
             Logger.info("Attempting to go back to chosen back destination")
             try:
                 #go back to chosen place
-                roboprinter.robosm.current = self.back_destination
+                waldoprinter.waldosm.current = self.back_destination
                 Logger.info("Successfully went back")
             except Exception as e:
                 Logger.info("Screen did not exist, Exiting to main")
-                roboprinter.robosm.current = 'main'
+                waldoprinter.waldosm.current = 'main'
             
 
     def show_current_screen(self):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-09-27 17:53:43
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2017-10-27 13:18:57
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:18:57
 
 
 #kivy
@@ -12,9 +12,9 @@ from kivy.clock import Clock
 #python
 from functools import partial
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.Language import lang
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.Language import lang
 class Directory_Browser(object):
     """
     docstring for Directory_Browser
@@ -33,7 +33,7 @@ class Directory_Browser(object):
     buttons=None
     def __init__(self):
         super(Directory_Browser, self).__init__()
-        self.oprint = roboprinter.printer_instance
+        self.oprint = waldoprinter.printer_instance
         self.buttons=None
         self.build_directory()
         
@@ -45,7 +45,7 @@ class Directory_Browser(object):
 
         #start a clock to analyze files
         # def analysis(dt):
-        #     roboprinter.printer_instance.start_analysis(files=self.directory)
+        #     waldoprinter.printer_instance.start_analysis(files=self.directory)
         # Clock.schedule_once(analysis, 0.2)
         
 

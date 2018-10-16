@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-11 12:11:58
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-02-21 18:08:11
- #kivy
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 18:08:11\
+
+#Kivy
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
@@ -14,19 +15,19 @@ from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.common_screens import Picture_Button_Screen, Wait_Screen, Override_Layout,Picture_Button_Screen_Body, Button_Screen, Info_Screen
-from RoboLCD.lcd.Language import lang
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.common_screens import Picture_Button_Screen, Wait_Screen, Override_Layout,Picture_Button_Screen_Body, Button_Screen, Info_Screen
+from WaldoLCD.lcd.Language import lang
 
 
 class Z_Offset_Workflow(object):
     """docstring for Z_Offset_Workflow"""
     def __init__(self, selected_tool, callback, update_z_offset, back_button, group, **kwargs):
         super(Z_Offset_Workflow, self).__init__()
-        self.model = roboprinter.printer_instance._settings.get(['Model'])
+        self.model = waldoprinter.printer_instance._settings.get(['Model'])
         self.selected_tool = selected_tool
         self.callback = callback
         self.update_z_offset = update_z_offset
@@ -77,17 +78,17 @@ class Z_Offset_Workflow(object):
 
     def wait_screen_skip_action(self):
         Logger.info("Prepare Printer back action!")
-        roboprinter.printer_instance._printer.commands('M107')
+        waldoprinter.printer_instance._printer.commands('M107')
         self.bb.back_function_flow()
 
     def restore_z_offset(self):
-        roboprinter.printer_instance._printer.commands('M107')
+        waldoprinter.printer_instance._printer.commands('M107')
         self.wait_screen.changed_screen = True
         if self.selected_tool in self.old_z_offset:
             Logger.info("User backed out, restoring Z Offset")
             write_zoffset = 'M206 Z' + str(self.old_z_offset[self.selected_tool])
             save_to_eeprom = 'M500'
-            roboprinter.printer_instance._printer.commands([write_zoffset, save_to_eeprom])
+            waldoprinter.printer_instance._printer.commands([write_zoffset, save_to_eeprom])
             Logger.info("Restored Z Offset to: " + str(self.old_z_offset[self.selected_tool]))
         else:
             Logger.info("User backed out but there is no old Z Offset data")
@@ -95,7 +96,7 @@ class Z_Offset_Workflow(object):
 
 
     def check_temp_and_change_screen(self, *args, **kwargs):
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = waldoprinter.printer_instance._printer.get_current_temperatures()
 
         #find the temperature
         extruder_temp = 0 #initialize the variable so the function does not break.
@@ -110,8 +111,8 @@ class Z_Offset_Workflow(object):
             self.temperature_wait_screen()
 
     def temperature_wait_screen(self, *args):
-        title = roboprinter.lang.pack['ZOffset_Wizard']['Wait']
-        back_destination = roboprinter.robo_screen()
+        title = waldoprinter.lang.pack['ZOffset_Wizard']['Wait']
+        back_destination = waldoprinter.waldo_screen()
 
         layout = Z_Offset_Temperature_Wait_Screen(self.selected_tool, self.offset_adjustment_screen)
 
@@ -126,11 +127,11 @@ class Z_Offset_Workflow(object):
     def offset_adjustment_screen(self, *args):
 
         #turn off fan
-        roboprinter.printer_instance._printer.commands('M106 S0')
+        waldoprinter.printer_instance._printer.commands('M106 S0')
         """
         Instructions screen
         """
-        title = roboprinter.lang.pack['ZOffset_Wizard']['Z_24']
+        title = waldoprinter.lang.pack['ZOffset_Wizard']['Z_24']
 
         Logger.info("Updated Zoffset is: " + str(self.z_pos_init))
 
@@ -186,9 +187,9 @@ class Z_Offset_Workflow(object):
         self.change_tool()
 
         #kill the extruder
-        roboprinter.printer_instance._printer.commands('M104 S0')
-        roboprinter.printer_instance._printer.commands('M140 S0')
-        roboprinter.printer_instance._printer.commands('M106 S255')
+        waldoprinter.printer_instance._printer.commands('M104 S0')
+        waldoprinter.printer_instance._printer.commands('M140 S0')
+        waldoprinter.printer_instance._printer.commands('M106 S255')
 
         #save the current ZOffset
         self.old_z_offset[self.selected_tool] =  pconsole.home_offset['Z']
@@ -198,29 +199,29 @@ class Z_Offset_Workflow(object):
 
         #set the ZOffset to zero
         Logger.info("Setting the Z-Offset to 0!")
-        roboprinter.printer_instance._printer.commands('M206 Z0.00')
-        roboprinter.printer_instance._printer.commands("M851 Z0.00")
+        waldoprinter.printer_instance._printer.commands('M206 Z0.00')
+        waldoprinter.printer_instance._printer.commands("M851 Z0.00")
 
         #save the new offset
-        roboprinter.printer_instance._printer.commands('M500')
+        waldoprinter.printer_instance._printer.commands('M500')
 
         #home then move the head into the correct position
         Logger.info("Homing Printer")
-        roboprinter.printer_instance._printer.commands('G28')
+        waldoprinter.printer_instance._printer.commands('G28')
 
         bed_x = 8.00
         bed_y = 30.00
 
-        roboprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F10000')
+        waldoprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F10000')
 
         #on the R2 we can safely move closer to the nozzle, while on the C2 we cannot
         if self.model == "Robo R2":
-            roboprinter.printer_instance._printer.commands('G1 Z15 F1500')
+            waldoprinter.printer_instance._printer.commands('G1 Z15 F1500')
         else:
-            roboprinter.printer_instance._printer.commands('G1 Z20 F750')
+            waldoprinter.printer_instance._printer.commands('G1 Z20 F750')
 
-        roboprinter.printer_instance._printer.commands('M114')
-        roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!')
+        waldoprinter.printer_instance._printer.commands('M114')
+        waldoprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!')
 
     def change_tool(self):
         #wait until tool change has happened
@@ -228,7 +229,7 @@ class Z_Offset_Workflow(object):
             pass
 
     def position_callback(self, dt):
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = waldoprinter.printer_instance._printer.get_current_temperatures()
         pos = pconsole.get_position()
         if pos != False:
             xpos = int(float(pos[0]))
@@ -255,7 +256,7 @@ class Z_Offset_Workflow(object):
                 else:
                     Logger.info('User went to a different screen Unscheduling self.')
                     #turn off fan
-                    roboprinter.printer_instance._printer.commands('M106 S0')
+                    waldoprinter.printer_instance._printer.commands('M106 S0')
                     return False
 
             #if finding the position fails it will wait 30 seconds and continue
@@ -272,7 +273,7 @@ class Z_Offset_Workflow(object):
                 else:
                     Logger.info('User went to a different screen Unscheduling self.')
                     #turn off fan
-                    roboprinter.printer_instance._printer.commands('M106 S0')
+                    waldoprinter.printer_instance._printer.commands('M106 S0')
                     return False
 
             #position tracking
@@ -293,25 +294,25 @@ class Z_Offset_Workflow(object):
 
     def _save_zoffset(self, *args):
         #turn off fan
-        roboprinter.printer_instance._printer.commands('M106 S0')
+        waldoprinter.printer_instance._printer.commands('M106 S0')
         #write new home offset to printer
         write_zoffset = 'M206 Z' + str(self.zoffset)
         save_to_eeprom = 'M500'
-        roboprinter.printer_instance._printer.commands([write_zoffset, save_to_eeprom])
+        waldoprinter.printer_instance._printer.commands([write_zoffset, save_to_eeprom])
         #pconsole.home_offset['Z'] = self.zoffset
 
 
     def end_wizard(self, *args):
         #turn off fan
         self._save_zoffset()
-        roboprinter.printer_instance._printer.commands('M106 S0')
+        waldoprinter.printer_instance._printer.commands('M106 S0')
 
         #capture the offset
-        from RoboLCD.lcd.wizards.FTZO.console_watcher import Console_Watcher
+        from WaldoLCD.lcd.wizards.FTZO.console_watcher import Console_Watcher
         Console_Watcher(self.wait_for_update)
 
         pconsole.query_eeprom()
-        roboprinter.printer_instance._printer.commands("M118 ACTION COMPLETE!")
+        waldoprinter.printer_instance._printer.commands("M118 ACTION COMPLETE!")
         Clock.schedule_interval(self.wait_for_update, 0.5)
 
 
@@ -328,9 +329,9 @@ class Z_Offset_Adjuster(BoxLayout):
                                 'Icons/Manual_Control/increments_3_2.png',
                                 'Icons/Manual_Control/increments_3_3.png']
                               )
-    s_toggle_mm = ListProperty([roboprinter.lang.pack['ZOffset_Wizard']['zero_five'],
-                                roboprinter.lang.pack['ZOffset_Wizard']['one_zero'],
-                                roboprinter.lang.pack['ZOffset_Wizard']['two_zero']]
+    s_toggle_mm = ListProperty([waldoprinter.lang.pack['ZOffset_Wizard']['zero_five'],
+                                waldoprinter.lang.pack['ZOffset_Wizard']['one_zero'],
+                                waldoprinter.lang.pack['ZOffset_Wizard']['two_zero']]
                               )
     f_toggle_mm = ListProperty([0.05, 0.1, 0.2])
     toggle_mm = NumericProperty(1)
@@ -361,7 +362,7 @@ class Z_Offset_Adjuster(BoxLayout):
 #TODO Refactor this screen to say which extruder it's waiting on
 class Z_Offset_Temperature_Wait_Screen(FloatLayout):
 
-    body_text = StringProperty(roboprinter.lang.pack['ZOffset_Wizard']['Cooldown'])
+    body_text = StringProperty(waldoprinter.lang.pack['ZOffset_Wizard']['Cooldown'])
     temperature = StringProperty("999")
     bed_temp = StringProperty("999")
 
@@ -371,9 +372,9 @@ class Z_Offset_Temperature_Wait_Screen(FloatLayout):
 
         self.selected_tool = selected_tool
         #setup callback
-        model = roboprinter.printer_instance._settings.get(['Model'])
+        model = waldoprinter.printer_instance._settings.get(['Model'])
         if model == "Robo R2":
-            self.body_text = roboprinter.lang.pack['ZOffset_Wizard']['Cooldown']
+            self.body_text = waldoprinter.lang.pack['ZOffset_Wizard']['Cooldown']
             Clock.schedule_interval(self.temp_callback_R2, 0.5)
         else:
             Clock.schedule_interval(self.temperature_callback, 0.5)
@@ -385,7 +386,7 @@ class Z_Offset_Temperature_Wait_Screen(FloatLayout):
         self.changed_screen = True
 
     def temperature_callback(self,dt):
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = waldoprinter.printer_instance._printer.get_current_temperatures()
         position_found_waiting_for_temp = False
 
         #get current temperature
@@ -405,7 +406,7 @@ class Z_Offset_Temperature_Wait_Screen(FloatLayout):
 
 
     def temp_callback_R2(self, dt):
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = waldoprinter.printer_instance._printer.get_current_temperatures()
         position_found_waiting_for_temp = False
         bed = 100
         #get current temperature

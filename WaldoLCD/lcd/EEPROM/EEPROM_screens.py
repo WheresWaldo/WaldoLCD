@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-18 15:12:00
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 15:25:47
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:25:47
 
 #Kivy
 from kivy.uix.boxlayout import BoxLayout
@@ -23,12 +23,12 @@ import collections
 import traceback
 from functools import partial
 
-#RoboLCD
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.common_screens import Wizard_Screen_Controls
-from RoboLCD import roboprinter
-from RoboLCD.lcd.connection_popup import Status_Popup
-from RoboLCD.lcd.pconsole import pconsole
+#WaldoLCD
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.common_screens import Wizard_Screen_Controls
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.connection_popup import Status_Popup
+from WaldoLCD.lcd.pconsole import pconsole
 
 
 
@@ -291,9 +291,9 @@ class Change_Value(BoxLayout, Wizard_Screen_Controls):
 
     def update_variable(self):
         update_string = self.command + " " + self.name + "{:0.2f}".format(self.value)
-        roboprinter.printer_instance._printer.commands(update_string)
-        roboprinter.printer_instance._printer.commands("M500")
-        ep = Status_Popup(roboprinter.lang.pack['EEPROM']['Error_Title'], roboprinter.lang.pack['EEPROM']['Error_Body'])
+        waldoprinter.printer_instance._printer.commands(update_string)
+        waldoprinter.printer_instance._printer.commands("M500")
+        ep = Status_Popup(waldoprinter.lang.pack['EEPROM']['Error_Title'], waldoprinter.lang.pack['EEPROM']['Error_Body'])
         ep.show()
         self.back_button()
 

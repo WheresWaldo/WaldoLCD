@@ -1,6 +1,6 @@
 import unittest
-from RoboLCD.lcd.update_system.Update_Interface import Update_Interface
-from RoboLCD.lcd.update_system.Update_System import Update_System
+from WaldoLCD.lcd.update_system.Update_Interface import Update_Interface
+from WaldoLCD.lcd.update_system.Update_System import Update_System
 
 class Update_Checker_Test(unittest.TestCase):
 

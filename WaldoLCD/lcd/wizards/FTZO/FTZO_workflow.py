@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-27 11:32:59
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-31 17:46:20
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 17:46:20
+
 #kivy
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -14,14 +15,14 @@ from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.common_screens import Button_Screen, Picture_Button_Screen
-from RoboLCD.lcd.common_screens import Wait_Screen, Modal_Question, Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
-from RoboLCD.lcd.wizards.FTZO.FTZO_screens import Update_Offset, FTZO_Options
+#WaldoLCD
+from WaldoLCD import WaldoLCD
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.common_screens import Button_Screen, Picture_Button_Screen
+from WaldoLCD.lcd.common_screens import Wait_Screen, Modal_Question, Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+from WaldoLCD.lcd.wizards.FTZO.FTZO_screens import Update_Offset, FTZO_Options
 
 
 #python
@@ -53,7 +54,7 @@ class FTZO_workflow(object):
         self.selected_tool = selected_tool #setting this variable will automatically select the tool and apply the temp for that tool        
         
         self.line_lock = False
-        self.model = roboprinter.printer_instance._settings.get(['Model'])
+        self.model = WaldoLCD.printer_instance._settings.get(['Model'])
         self.set_mode("R2L")#Modes are L2R and R2L
         self.prepared_printer = False
         self.user_back_out = False
@@ -114,9 +115,9 @@ class FTZO_workflow(object):
         self.corner = mode #set the appropriate mode
 
         #get bed dimensions
-        bed_x = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
-        bed_y = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
-        z_height = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','height'])
+        bed_x = WaldoLCD.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
+        bed_y = WaldoLCD.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
+        z_height = WaldoLCD.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','height'])
         offset = 10.00 #offset of 10mm from Max X/Y dimensions
         self.drop_amount = z_height / 2.00
 
@@ -156,34 +157,34 @@ class FTZO_workflow(object):
             self.EZO_screen.update_mode(self.mode)
             Logger.info("New Corner Picked########")
             #prepare the printer
-            roboprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
-            roboprinter.printer_instance._printer.commands('G1 Z5') #bring bed close to the nozzle
+            WaldoLCD.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
+            WaldoLCD.printer_instance._printer.commands('G1 Z5') #bring bed close to the nozzle
     
            
 
     #debug prepare for lines
     def debug_prepare(self, *args, **kwargs):
         def fire_commands(*args, **kwargs):
-            roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') 
+            WaldoLCD.printer_instance._printer.commands('M118 ACTION COMPLETE!') 
         Clock.schedule_once(fire_commands, 3)
 
     #Prepare the printer for the Wizard
     def prepare_for_lines(self, *args, **kwargs):
         #Prepare the printer for the wizard
         pconsole.query_eeprom() #getting the EEPROM for a seperate process
-        roboprinter.printer_instance._printer.commands('G36') #Robo's Autolevel
-        roboprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
-        roboprinter.printer_instance._printer.commands('G1 Z5') #bring bed close to the nozzle
-        roboprinter.printer_instance._printer.commands('M114') #process position
-        roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') 
+        WaldoLCD.printer_instance._printer.commands('G29') #Printer Autolevel
+        WaldoLCD.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
+        WaldoLCD.printer_instance._printer.commands('G1 Z5') #bring bed close to the nozzle
+        WaldoLCD.printer_instance._printer.commands('M114') #process position
+        WaldoLCD.printer_instance._printer.commands('M118 ACTION COMPLETE!') 
 
     #Show the wait screen
     def show_wait_screen(self, *args, **kwargs):
         self.wait_screen = Wait_Screen(self.check_temp, 
-                             roboprinter.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Sub_Title'] , 
-                             roboprinter.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Body'],
+                             WaldoLCD.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Sub_Title'] , 
+                             WaldoLCD.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Body'],
                              watch_action=True)
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Title']
+        title = WaldoLCD.lang.pack['FT_ZOffset_Wizard']['Prepare_Lines']['Title']
         self.wait_screen.update = self.wait_screen_skip_action
         self.wait_screen.change_screen_actions = self.user_backed_out
 
@@ -193,13 +194,13 @@ class FTZO_workflow(object):
 
     def wait_screen_skip_action(self):
         Logger.info("Prepare Printer back action! Killing heaters and fans")
-        roboprinter.printer_instance._printer.commands('M104 S0')
-        roboprinter.printer_instance._printer.commands('M140 S0')
+        WaldoLCD.printer_instance._printer.commands('M104 S0')
+        WaldoLCD.printer_instance._printer.commands('M140 S0')
         self.bb.back_function_flow()
 
     def user_backed_out(self, *args, **kwargs):
-        roboprinter.printer_instance._printer.commands('M104 S0')
-        roboprinter.printer_instance._printer.commands('M140 S0')
+        WaldoLCD.printer_instance._printer.commands('M104 S0')
+        WaldoLCD.printer_instance._printer.commands('M140 S0')
         self.user_back_out = True
         if self.pconsole_waiter != None:
             Logger.info("Attempting to kill waiter in the great hall with the candle stick")
@@ -208,7 +209,7 @@ class FTZO_workflow(object):
     #wait for temperatures
     def check_temp(self, *args, **kwargs):
         Logger.info("Checking Temp")
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = WaldoLCD.printer_instance._printer.get_current_temperatures()
 
         #find the temperature
         extruder_temp = 0 #initialize the variable so the function does not break.
@@ -226,17 +227,17 @@ class FTZO_workflow(object):
                 self.show_EZO_screen()
 
     def temperature_wait_screen(self, *args):
-        title = roboprinter.lang.pack['ZOffset_Wizard']['Wait']
-        back_destination = roboprinter.robo_screen()
+        title = WaldoLCD.lang.pack['ZOffset_Wizard']['Wait']
+        back_destination = WaldoLCD.waldo_screen()
 
         #get wait screen
-        from RoboLCD.lcd.common_screens import Temperature_Wait_Screen
+        from WaldoLCD.lcd.common_screens import Temperature_Wait_Screen
 
         #wait for the temperature to change, then go back to the EZO screen
         layout = Temperature_Wait_Screen(self.show_EZO_screen, tool_select=self.selected_tool)
         layout.update = self.wait_screen_skip_action
         layout.change_screen_actions = self.turn_off_heaters
-        title= roboprinter.lang.pack['FT_ZOffset_Wizard']['Temp_Wait_Title']
+        title= WaldoLCD.lang.pack['FT_ZOffset_Wizard']['Temp_Wait_Title']
         self.bb.make_screen(layout, 
                                                 title,
                                                 option_function='no_option')
@@ -244,8 +245,8 @@ class FTZO_workflow(object):
         Logger.info("Temperature Wait Screen Activated")
 
     def turn_off_heaters(self):
-        roboprinter.printer_instance._printer.commands('M104 S0')
-        roboprinter.printer_instance._printer.commands('M140 S0')
+        WaldoLCD.printer_instance._printer.commands('M104 S0')
+        WaldoLCD.printer_instance._printer.commands('M140 S0')
 
 
     def show_EZO_screen(self, *args, **kwargs):
@@ -276,7 +277,7 @@ class FTZO_workflow(object):
             self.options = FTZO_Options(self.dual, self.mode, self.set_mode, self.selected_tool_get_and_set, self.save_offset, self.callback, self.bb)
 
         self.bb.make_screen(self.options,
-                            roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Title'],
+                            WaldoLCD.lang.pack['FT_ZOffset_Wizard']['Options']['Title'],
                             option_function="no_option")
 
     #this function is passed to another class to use to update this property variable as we cannot share the properties getter and setter directly
@@ -313,7 +314,7 @@ class FTZO_workflow(object):
             return False
     def get_state(self):
         Logger.info("Finding State")
-        settings = roboprinter.printer_instance._settings
+        settings = WaldoLCD.printer_instance._settings
         profile = settings.global_get(['printerProfiles', 'defaultProfile'])
 
         if 'extruder' in profile:
@@ -330,24 +331,24 @@ class FTZO_workflow(object):
 
         #This will cooldown all extruders.
         state = self.get_state()
-        roboprinter.printer_instance._printer.commands('M104 T0 S0')
+        WaldoLCD.printer_instance._printer.commands('M104 T0 S0')
         if int(state['extruder']) > 1:
-            roboprinter.printer_instance._printer.commands('M104 T1 S0')
+            WaldoLCD.printer_instance._printer.commands('M104 T1 S0')
 
         #since we already parsed temps out into a dictionary in a previous class we just have to apply the temperature
         if self.selected_tool in self.temps:
             Logger.info("Setting " + str(self.selected_tool) + " to " + str(self.temps[self.selected_tool]))
-            roboprinter.printer_instance._printer.set_temperature(self.selected_tool, self.temps[self.selected_tool])
+            WaldoLCD.printer_instance._printer.set_temperature(self.selected_tool, self.temps[self.selected_tool])
 
         #if there is a bed temp, select that too
         if 'bed' in self.temps:
             selected_tool = 'bed'
             Logger.info("Setting " + str(selected_tool) + " to " + str(self.temps[selected_tool]))
-            roboprinter.printer_instance._printer.set_temperature(selected_tool, self.temps[selected_tool])
+            WaldoLCD.printer_instance._printer.set_temperature(selected_tool, self.temps[selected_tool])
 
 
     def save_offset(self):
-        roboprinter.printer_instance._printer.commands('M500')
+        WaldoLCD.printer_instance._printer.commands('M500')
         pconsole.query_eeprom()
         offset = pconsole.home_offset['Z']
         return offset

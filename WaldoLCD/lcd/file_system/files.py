@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-09-27 15:58:32
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-02-22 09:43:44
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 09:43:44
 #Kivy
+
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -35,13 +36,13 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from functools import partial
 
-#RoboLCD
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD import roboprinter
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Robo_Icons, Storage_Icons
-from RoboLCD.lcd.connection_popup import Zoffset_Warning_Popup, Error_Popup, USB_Progress_Popup
-from RoboLCD.lcd.session_saver import session_saver
+#WaldoLCD
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Icons, Waldo_Icons, Storage_Icons
+from WaldoLCD.lcd.connection_popup import Zoffset_Warning_Popup, Error_Popup, USB_Progress_Popup
+from WaldoLCD.lcd.session_saver import session_saver
 from file_explorer import File_Explorer
 from file_options import FileOptions
 from file_overseer import File_Overseer
@@ -169,8 +170,8 @@ class FilesContent(BoxLayout):
         #Logger.info("Opening screen")
 
         self.screen.delete_same_name_screens()
-        roboprinter.robosm.add_widget(self.screen)
-        roboprinter.robosm.current = self.screen.name
+        waldoprinter.waldosm.add_widget(self.screen)
+        waldoprinter.waldosm.current = self.screen.name
 
     def update_files(self):
         
@@ -236,7 +237,7 @@ class FilesContent(BoxLayout):
                 'usb_attached': self.has_usb_attached,
                 'usb_mounted': not self.usb_button.button_state #originally this variable means "is_disabled?" so flip it to make sense to us
             }
-            roboprinter.printer_instance._plugin_manager.send_plugin_message(roboprinter.printer_instance._identifier, dict(type="usb_status", data=usb_dict))
+            waldoprinter.printer_instance._plugin_manager.send_plugin_message(waldoprinter.printer_instance._identifier, dict(type="usb_status", data=usb_dict))
     
 
     def update_usb_status(self):
@@ -253,4 +254,4 @@ class FilesContent(BoxLayout):
     #This function uses a shared funtion in the Meta Reader Plugin to collect information from a pipe
     #without disturbing the main thread
     def collect_meta_data(self, dt):
-        roboprinter.printer_instance.collect_data()
+        waldoprinter.printer_instance.collect_data()

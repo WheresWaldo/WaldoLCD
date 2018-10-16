@@ -122,7 +122,7 @@ Utilities:
 QR_AC_Code: "Log into the web dashboard to find the\nAPI QR Code in your settings."
 
 
-RoboIcons:
+WaldoIcons:
   Configure_WiFi: "Configure Wi-Fi"
   Start_WiFi: "Start Wi-Fi Hotspot"
   Network_Status: "Network Status"
@@ -176,7 +176,7 @@ System:
 
 
 # https://drive.google.com/open?id=16jVMkRUa_RTTgvGakc6jX5m7wA8YPxQbMaOtkY1dDCo
-Robo_Controls:
+Waldo_Controls:
   Temperature_Controls: "Temp. Controls"
   Motor_Controls: "Motor Controls"
 
@@ -728,8 +728,8 @@ Error_Detection:
     E_Update: "Update"
     E_Cancel: "Cancel"
   DEFAULT:
-    Title_Idle: "Robo ready"
-    Title_Active: "Robo active"
+    Title_Idle: "Printer ready"
+    Title_Active: "Printer active"
     Body_Idle: "Let's print something!"
     Body_Active: "Print in progress."
 
@@ -893,7 +893,7 @@ Update_Printer:
   Welcome:
     Installed: "Installed:"
     Available: "Available:"
-    RoboOS: "RoboOS"
+    WaldoOS: "WaldoOS"
     Update: "Update"
     Up2Date: "Up-to-date"
 

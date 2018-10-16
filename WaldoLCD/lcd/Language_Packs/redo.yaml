@@ -122,7 +122,7 @@ Utilities:
 QR_AC_Code: "es lacus molestie. Quisque quis ligula \nmauris. Phasellus et placerat "
 
 
-RoboIcons:
+WaldoIcons:
   Configure_WiFi: "justo, mattis v"
   Start_WiFi: "iverra elit. Duis r"
   Network_Status: "honcus, libero"
@@ -176,7 +176,7 @@ System:
 
 
 # https://drive.google.com/open?id=16jVMkRUa_RTTgvGakc6jX5m7wA8YPxQbMaOtkY1dDCo
-Robo_Controls:
+Waldo_Controls:
   Temperature_Controls: "a odio sit ame"
   Motor_Controls: "t, blandit sod"
 
@@ -889,7 +889,7 @@ Update_Printer:
   Welcome:
     Installed: "odio sit a"
     Available: "met, bland"
-    RoboOS: "it sod"
+    WaldoOS: "it sod"
     Update: "ales e"
     Up2Date: "ros. Curab"
 

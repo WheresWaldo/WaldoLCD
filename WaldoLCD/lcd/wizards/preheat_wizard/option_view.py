@@ -16,17 +16,17 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.logger import Logger
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.connection_popup import Info_Popup, Error_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.connection_popup import Info_Popup, Error_Popup
 
-from RoboLCD.lcd.wizards.preheat_wizard.preheat_buttons import Preheat_Button, Simple_Button, Dual_Button
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_buttons import Preheat_Button, Simple_Button, Dual_Button
 
 #Python
 from functools import partial
@@ -39,7 +39,7 @@ class Option_View(BoxLayout):
 
     def __init__(self, option=None, dual=False, callback = None, delete_callback = None, back_destination = None, back_button_screen=None, group=None, **kwargs):
         super(Option_View, self).__init__()
-        self.model = roboprinter.printer_instance._settings.get(['Model'])
+        self.model = waldoprinter.printer_instance._settings.get(['Model'])
         self.back_destination = back_destination
         self.callback = callback
         self.delete_callback = delete_callback
@@ -74,7 +74,7 @@ class Option_View(BoxLayout):
     #This populates a known option with preset variables
     def populate_option(self, option):
         #get presets
-        preset_options = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+        preset_options = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
 
         self.selected_option = {option: preset_options[option]}
         Logger.info("Selected Preset is: " + str(self.selected_option))
@@ -126,7 +126,7 @@ class Option_View(BoxLayout):
     #This populates a known option with preset variables
     def populate_dual_option(self, option):
         #get presets
-        preset_options = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+        preset_options = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
         self.selected_option = {option: preset_options[option]}
         Logger.info("Selected Preset is: " + str(self.selected_option))
 
@@ -292,7 +292,7 @@ class Option_View(BoxLayout):
         #keyboard_callback = None, default_text = '', name = 'keyboard_screen', title=lang.pack['Keyboard']['Default_Title']
         KeyboardInput(keyboard_callback=self.get_keyboard_results,
                       default_text=name,
-                      back_destination=roboprinter.robosm.current,
+                      back_destination=waldoprinter.waldosm.current,
                       title=title,
                       back_button=self.bb,
                       group=self.group)
@@ -324,7 +324,7 @@ class Option_View(BoxLayout):
             self.name_button.update_value(str(result))
 
             if self.bb == None:
-                roboprinter.robosm.current = 'edit_preheat'
+                waldoprinter.waldosm.current = 'edit_preheat'
             else:
                 Logger.info("Going back a page with group: " + str(self.group))
                 if self.option != None:
@@ -341,7 +341,7 @@ class Option_View(BoxLayout):
         #check if the result will overwrite an existing preset
         preheat_name = next(iter(self.selected_option))
         Logger.info("Result is: " + str(result) + " Name is: " + str(preheat_name))
-        preheat_settings = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+        preheat_settings = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
         if result != preheat_name and result in preheat_settings:
             #make the modal screen
             body_text = lang.pack['Preheat']['Duplicate']['Body_Text'] + str(result) + lang.pack['Preheat']['Duplicate']['Body_Text1']
@@ -349,7 +349,7 @@ class Option_View(BoxLayout):
 
             #make screen
             if self.bb == None:
-                roboprinter.robosm._generate_backbutton_screen(name='duplicate_error',
+                waldoprinter.waldosm._generate_backbutton_screen(name='duplicate_error',
                                                                title = lang.pack['Preheat']['Duplicate']['Title'],
                                                                back_destination='edit_preheat',
                                                                content=modal_screen)
@@ -456,11 +456,11 @@ class Option_View(BoxLayout):
     def save_preset(self):
         #get all the options
         if not self.dual:
-            presets = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+            presets = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
         else:
-            presets = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+            presets = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
 
-        current_screen = roboprinter.robosm.current
+        current_screen = waldoprinter.waldosm.current
         name = next(iter(self.selected_option))
 
 
@@ -474,8 +474,8 @@ class Option_View(BoxLayout):
                 presets[name] = self.selected_option[name]
 
                 #save
-                roboprinter.printer_instance._settings.set(['Temp_Preset'], presets)
-                roboprinter.printer_instance._settings.save()
+                waldoprinter.printer_instance._settings.set(['Temp_Preset'], presets)
+                waldoprinter.printer_instance._settings.save()
 
             else:
                 if self.original_option != None:
@@ -485,8 +485,8 @@ class Option_View(BoxLayout):
                 presets[name] = self.selected_option[name]
 
                 #save
-                roboprinter.printer_instance._settings.set(['Dual_Temp_Preset'], presets)
-                roboprinter.printer_instance._settings.save()
+                waldoprinter.printer_instance._settings.set(['Dual_Temp_Preset'], presets)
+                waldoprinter.printer_instance._settings.save()
 
             #go back to screen
             self.callback('',name)
@@ -494,7 +494,7 @@ class Option_View(BoxLayout):
         def cancel():
             #go back to previous screen
             if self.bb == None:
-                roboprinter.robosm.current = current_screen
+                waldoprinter.waldosm.current = current_screen
             else:
                 if self.option != None:
                     self.bb.go_back_to_screen_with_title(lang.pack['Preheat']['Edit_Preset']['Title'], group=self.group)
@@ -516,7 +516,7 @@ class Option_View(BoxLayout):
 
             #make screen
             if self.bb == None:
-                roboprinter.robosm._generate_backbutton_screen(name='duplicate_error',
+                waldoprinter.waldosm._generate_backbutton_screen(name='duplicate_error',
                                                                title = lang.pack['Preheat']['Duplicate']['Title'],
                                                                back_destination=current_screen,
                                                                content=modal_screen)
@@ -531,19 +531,19 @@ class Option_View(BoxLayout):
 
 
     def delete_preset(self):
-        screen = roboprinter.robosm.current
+        screen = waldoprinter.waldosm.current
         def delete():
             if not self.dual:
                 #get all the options
-                presets = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+                presets = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
 
                 #delete entry
                 name = next(iter(self.selected_option))
                 del presets[name]
 
                 #save
-                roboprinter.printer_instance._settings.set(['Temp_Preset'], presets)
-                roboprinter.printer_instance._settings.save()
+                waldoprinter.printer_instance._settings.set(['Temp_Preset'], presets)
+                waldoprinter.printer_instance._settings.save()
 
                 #Info Popup saying that we deleted the preset
                 title = lang.pack['Preheat']['Delete']['Deleted']
@@ -551,15 +551,15 @@ class Option_View(BoxLayout):
                 ep.show()
             else:
                 #get all the options
-                presets = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+                presets = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
 
                 #delete entry
                 name = next(iter(self.selected_option))
                 del presets[name]
 
                 #save
-                roboprinter.printer_instance._settings.set(['Dual_Temp_Preset'], presets)
-                roboprinter.printer_instance._settings.save()
+                waldoprinter.printer_instance._settings.set(['Dual_Temp_Preset'], presets)
+                waldoprinter.printer_instance._settings.save()
 
                 #Info Popup saying that we deleted the preset
                 title = lang.pack['Preheat']['Delete']['Deleted']
@@ -569,7 +569,7 @@ class Option_View(BoxLayout):
         def cancel():
             #go back to previous screen
             if self.bb == None:
-                roboprinter.robosm.current = screen
+                waldoprinter.waldosm.current = screen
             else:
                 if self.option != None:
                     self.bb.go_back_to_screen_with_title(lang.pack['Preheat']['Edit_Preset']['Title'], group=self.group)
@@ -587,7 +587,7 @@ class Option_View(BoxLayout):
 
         #make screen
         if self.bb == None:
-            roboprinter.robosm._generate_backbutton_screen(name='delete_preset',
+            waldoprinter.waldosm._generate_backbutton_screen(name='delete_preset',
                                                            title = lang.pack['Preheat']['Delete']['Title'] ,
                                                            back_destination=screen,
                                                            content=modal_screen)

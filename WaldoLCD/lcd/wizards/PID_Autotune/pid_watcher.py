@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-31 13:02:40
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-30 12:31:35
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 12:31:35
+
 import octoprint.printer
-from RoboLCD import roboprinter
+from WaldoLCD import waldoprinter
 import time
 from kivy.clock import Clock
 from kivy.logger import Logger
@@ -23,7 +24,7 @@ class PID_Watcher(octoprint.printer.PrinterCallback, object):
 
         #register the observer with octoprint
         Logger.info("Registering Console Watcher")
-        roboprinter.printer_instance._printer.register_callback(self)
+        waldoprinter.printer_instance._printer.register_callback(self)
 
     def cleanup(self):
         Logger.info("Unregistering Console Watcher through __del__!")
@@ -34,7 +35,7 @@ class PID_Watcher(octoprint.printer.PrinterCallback, object):
         self.timeout_callback = ''
 
         #unregister if we have not already
-        roboprinter.printer_instance._printer.unregister_callback(self)
+        waldoprinter.printer_instance._printer.unregister_callback(self)
 
         #delete self
         del self
@@ -58,7 +59,7 @@ class PID_Watcher(octoprint.printer.PrinterCallback, object):
     def callback_caller(self, *args, **kwargs):
         if callable(self.callback):
             self.callback()
-        roboprinter.printer_instance._printer.unregister_callback(self)
+        waldoprinter.printer_instance._printer.unregister_callback(self)
         self.cleanup()
 
     def test_increment(self, *args, **kwargs):
@@ -72,7 +73,7 @@ class PID_Watcher(octoprint.printer.PrinterCallback, object):
     def timeout(self, *args, **kwargs):
         if callable(self.timeout_callback):
             self.timeout_callback()
-        roboprinter.printer_instance._printer.unregister_callback(self)
+        waldoprinter.printer_instance._printer.unregister_callback(self)
         self.cleanup()
 
     @property

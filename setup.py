@@ -68,7 +68,7 @@ plugin_author = "Matt Pedler & Victor E Fimbres & Peri Smith modded by BH"
 plugin_author_email = "Developer@robo3d.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/WheresWaldo/roboLCD_current"
+plugin_url = "https://github.com/WheresWaldo/WaldoLCD"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"

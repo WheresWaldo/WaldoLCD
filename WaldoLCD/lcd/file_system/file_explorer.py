@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-09-27 17:53:43
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2017-12-06 16:40:49
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 16:40:49
 
 #kivy
 from kivy.logger import Logger
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.common_screens import KeyboardInput, Modal_Question_No_Title, Button_Group_Observer
-from RoboLCD.lcd.connection_popup import Error_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.common_screens import KeyboardInput, Modal_Question_No_Title, Button_Group_Observer
+from WaldoLCD.lcd.connection_popup import Error_Popup
 from directory_browser import Directory_Browser
 from file_screen import StandardFileButton, StandardFileView, FolderButton, File_Option_Button, Scroll_Box_File_List, PrintFile
-from RoboLCD.lcd.slicer_wizard import Slicer_Wizard
+from WaldoLCD.lcd.slicer_wizard import Slicer_Wizard
 
 #python
 from datetime import datetime
@@ -39,10 +39,10 @@ class File_Explorer(Scroll_Box_File_List):
 
         #default title
         self.current_title = lang.pack['Files']['Local']
-        self.settings = roboprinter.printer_instance._settings
+        self.settings = waldoprinter.printer_instance._settings
         self.editing = False
         self.directory = Directory_Browser()
-        self.oprint = roboprinter.printer_instance
+        self.oprint = waldoprinter.printer_instance
         self.file_list = []
         self.show_only_folders_callback = show_only_folders_callback
         self.selected_folders = {}
@@ -88,7 +88,7 @@ class File_Explorer(Scroll_Box_File_List):
         self.files = self.directory.return_current_directory()
         self.update_callback(self.file_callback)
         self.current_title = self.directory.dir_name
-        roboprinter.screen_controls.update_title(self.current_title)
+        waldoprinter.screen_controls.update_title(self.current_title)
         self.update_screen_list()
 
         
@@ -144,7 +144,7 @@ class File_Explorer(Scroll_Box_File_List):
 
         #update title
         self.current_title = self.directory.dir_name
-        roboprinter.screen_controls.update_title(self.current_title)
+        waldoprinter.screen_controls.update_title(self.current_title)
 
         if not resume:
             self.update_screen_list()
@@ -186,7 +186,7 @@ class File_Explorer(Scroll_Box_File_List):
         self.files = folders_only
         self.update_callback(self.folders_only_callback)
         self.current_title = self.directory.dir_name
-        roboprinter.screen_controls.update_title(self.current_title)
+        waldoprinter.screen_controls.update_title(self.current_title)
         self.update_screen_list()
 
     def folders_only_callback(self, file_data):
@@ -195,7 +195,7 @@ class File_Explorer(Scroll_Box_File_List):
             self.current_title = file_data['name']
             folders_only = {}
             self.update_folders()
-            roboprinter.screen_controls.update_title(self.current_title)
+            waldoprinter.screen_controls.update_title(self.current_title)
         else:
             Logger.info("Not and Option! " + str(name))
 
@@ -204,7 +204,7 @@ class File_Explorer(Scroll_Box_File_List):
             self.current_title = self.directory.dir_name
             self.update_folders()
 
-            roboprinter.screen_controls.update_title(self.current_title)
+            waldoprinter.screen_controls.update_title(self.current_title)
         else:
             Logger.info("Cant go back any farther! Returning to previous screen.")
             self.return_to_previous_file_pos() #returns file explorer to the directory it left off at
@@ -212,7 +212,7 @@ class File_Explorer(Scroll_Box_File_List):
             #go back to previous screen
             previous_screen_callback()
             if back_to_name != None:
-                roboprinter.robosm.current = back_to_name
+                waldoprinter.waldosm.current = back_to_name
 
     def return_to_previous_file_pos(self):
         #go back to root
@@ -256,25 +256,25 @@ class File_Explorer(Scroll_Box_File_List):
 
         def firmware_wizard(file_data, *args, **kwargs):
             path = self.storage.path_on_disk(file_data['path'])
-            roboprinter.printer_instance.flash_usb(path)
+            waldoprinter.printer_instance.flash_usb(path)
         #figure out what type of file we have 
 
         #execute the Firmware Wizard!
         if file_data['type'] == "firmware":
-            back_screen = roboprinter.screen_controls.get_screen_data()
-            back_button = partial(roboprinter.screen_controls.populate_old_screen, screen=back_screen)
-            layout = StandardFileView(file_data, roboprinter.lang.pack['Firmware_Wizard']['Start_Firmware'] ,firmware_wizard)
-            roboprinter.screen_controls.set_screen_content(layout, roboprinter.lang.pack['Firmware_Wizard']['Title'], 
+            back_screen = waldoprinter.screen_controls.get_screen_data()
+            back_button = partial(waldoprinter.screen_controls.populate_old_screen, screen=back_screen)
+            layout = StandardFileView(file_data, waldoprinter.lang.pack['Firmware_Wizard']['Start_Firmware'] ,firmware_wizard)
+            waldoprinter.screen_controls.set_screen_content(layout, waldoprinter.lang.pack['Firmware_Wizard']['Title'], 
                                                            back_function=back_button, 
                                                            option_function = 'no_option')
         
         #Make a File Screen and Print
         elif file_data['type'] == "machinecode":
             layout = PrintFile(file_data)
-            back_screen = roboprinter.screen_controls.get_screen_data()
-            back_button = partial(roboprinter.screen_controls.populate_old_screen, screen=back_screen)
+            back_screen = waldoprinter.screen_controls.get_screen_data()
+            back_button = partial(waldoprinter.screen_controls.populate_old_screen, screen=back_screen)
             back_function = partial(layout.exit_function, exit_callback=back_button)
-            roboprinter.screen_controls.set_screen_content(layout, 
+            waldoprinter.screen_controls.set_screen_content(layout, 
                                                            file_data['name'], 
                                                            back_function=back_function,
                                                            option_function = 'no_option')
@@ -289,7 +289,7 @@ class File_Explorer(Scroll_Box_File_List):
             if os.path.isfile(temp_file_path):
                 with open(temp_file_path, "a") as file:
                     file.write("\n\n") #skip two lines
-                    file.write("; Custom Meta Data from RoboLCD Written by Matt Pedler:\n")
+                    file.write("; Custom Meta Data from WaldoLCD Written by Matt Pedler:\n")
                     for meta in file_meta_data:
                         file.write("; " + str(meta) + " = " + str(file_meta_data[meta]) + "\n")
             else:
@@ -326,7 +326,7 @@ class File_Explorer(Scroll_Box_File_List):
             #return to the save directory
             goto_file_explorer_callback()
 
-        roboprinter.robosm.current = "File_Explorer"
+        waldoprinter.waldosm.current = "File_Explorer"
 
         save_dict = {
                 'callback' : save_to_dir,
@@ -462,7 +462,7 @@ class File_Explorer(Scroll_Box_File_List):
             self.current_title = name
 
             self.update_file_screen()
-            roboprinter.screen_controls.update_title(self.current_title)
+            waldoprinter.screen_controls.update_title(self.current_title)
         else:
             Logger.info("Not and Option!!!!! " + str(name))
 
@@ -472,14 +472,14 @@ class File_Explorer(Scroll_Box_File_List):
                 
                 self.current_title = self.directory.dir_name
                 self.update_file_screen()
-                roboprinter.screen_controls.update_title(self.current_title)
+                waldoprinter.screen_controls.update_title(self.current_title)
             else:
                 Logger.info("Cant go back any farther! Returning to main screen")
     
                 #go back to main
                 if 'file_callback' in session_saver.saved:
                     session_saver.saved['file_callback']() #this will update the size of the directory
-                roboprinter.robosm.go_back_to_main('files_tab')
+                waldoprinter.waldosm.go_back_to_main('files_tab')
 
         #checks to see if exit is true, if it is then it will exit on the selected directory(Only USB currently). If it is not true then it
         #will exit on the root directory
@@ -490,7 +490,7 @@ class File_Explorer(Scroll_Box_File_List):
                 #go back to main
                 if 'file_callback' in session_saver.saved:
                     session_saver.saved['file_callback']() #this will update the size of the directory
-                roboprinter.robosm.go_back_to_main('files_tab')
+                waldoprinter.waldosm.go_back_to_main('files_tab')
             else:
                 return_to_previous()
 

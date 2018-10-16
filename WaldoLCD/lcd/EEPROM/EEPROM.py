@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-19 13:34:53
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 15:08:44
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:08:44
 # coding=utf-8
 
 #Kivy
@@ -14,16 +14,16 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even_Button, Scroll_Box_Even
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD import roboprinter
-from RoboLCD.lcd.connection_popup import Status_Popup
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title, Button_Screen
-from RoboLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
-from RoboLCD.lcd.file_system.file_screen import Scroll_Box_File_List
-from RoboLCD.lcd.EEPROM.EEPROM_screens import Scroll_Box_EEPROM_List, Change_Value
+#WaldoLCD
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even_Button, Scroll_Box_Even
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.connection_popup import Status_Popup
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, Button_Screen
+from WaldoLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
+from WaldoLCD.lcd.file_system.file_screen import Scroll_Box_File_List
+from WaldoLCD.lcd.EEPROM.EEPROM_screens import Scroll_Box_EEPROM_List, Change_Value
 
 
 class EEPROM(object):
@@ -39,42 +39,42 @@ class EEPROM(object):
         self.group = 'EEPROM_Group'
        
         #add bb
-        roboprinter.robosm.add_widget(self.bb)
-        roboprinter.robosm.current = self.bb.name
+        waldoprinter.waldosm.add_widget(self.bb)
+        waldoprinter.waldosm.current = self.bb.name
 
 
-        model = roboprinter.printer_instance._settings.get(['Model'])
+        model = waldoprinter.printer_instance._settings.get(['Model'])
         self.refresh_eeprom()
 
         if model == "Robo R2":
             #add bed PID for the R2
             self.button_order = [
-                                 roboprinter.lang.pack['EEPROM']['Home_Offset'],
-                                 roboprinter.lang.pack['EEPROM']['Probe_Offset'] , 
-                                 roboprinter.lang.pack['EEPROM']['Steps_Unit'], 
-                                 roboprinter.lang.pack['EEPROM']['Accelerations'], 
-                                 roboprinter.lang.pack['EEPROM']['Max_Accelerations'],  
-                                 roboprinter.lang.pack['EEPROM']['Filament_Settings'], 
-                                 roboprinter.lang.pack['EEPROM']['Feed_Rates'], 
-                                 roboprinter.lang.pack['EEPROM']['PID_Settings'],
-                                 roboprinter.lang.pack['EEPROM']['Bed_PID'], 
-                                 roboprinter.lang.pack['EEPROM']['Advanced'],
-                                 roboprinter.lang.pack['EEPROM']['Linear_Advanced'],
-                                 roboprinter.lang.pack['EEPROM']['Reset']
+                                 waldoprinter.lang.pack['EEPROM']['Home_Offset'],
+                                 waldoprinter.lang.pack['EEPROM']['Probe_Offset'] , 
+                                 waldoprinter.lang.pack['EEPROM']['Steps_Unit'], 
+                                 waldoprinter.lang.pack['EEPROM']['Accelerations'], 
+                                 waldoprinter.lang.pack['EEPROM']['Max_Accelerations'],  
+                                 waldoprinter.lang.pack['EEPROM']['Filament_Settings'], 
+                                 waldoprinter.lang.pack['EEPROM']['Feed_Rates'], 
+                                 waldoprinter.lang.pack['EEPROM']['PID_Settings'],
+                                 waldoprinter.lang.pack['EEPROM']['Bed_PID'], 
+                                 waldoprinter.lang.pack['EEPROM']['Advanced'],
+                                 waldoprinter.lang.pack['EEPROM']['Linear_Advanced'],
+                                 waldoprinter.lang.pack['EEPROM']['Reset']
                                  ]
         else:
             self.button_order = [
-                                 roboprinter.lang.pack['EEPROM']['Home_Offset'],
-                                 roboprinter.lang.pack['EEPROM']['Probe_Offset'] , 
-                                 roboprinter.lang.pack['EEPROM']['Steps_Unit'], 
-                                 roboprinter.lang.pack['EEPROM']['Accelerations'], 
-                                 roboprinter.lang.pack['EEPROM']['Max_Accelerations'],  
-                                 roboprinter.lang.pack['EEPROM']['Filament_Settings'], 
-                                 roboprinter.lang.pack['EEPROM']['Feed_Rates'], 
-                                 roboprinter.lang.pack['EEPROM']['PID_Settings'],
-                                 roboprinter.lang.pack['EEPROM']['Advanced'],
-                                 roboprinter.lang.pack['EEPROM']['Linear_Advanced'],
-                                 roboprinter.lang.pack['EEPROM']['Reset']
+                                 waldoprinter.lang.pack['EEPROM']['Home_Offset'],
+                                 waldoprinter.lang.pack['EEPROM']['Probe_Offset'] , 
+                                 waldoprinter.lang.pack['EEPROM']['Steps_Unit'], 
+                                 waldoprinter.lang.pack['EEPROM']['Accelerations'], 
+                                 waldoprinter.lang.pack['EEPROM']['Max_Accelerations'],  
+                                 waldoprinter.lang.pack['EEPROM']['Filament_Settings'], 
+                                 waldoprinter.lang.pack['EEPROM']['Feed_Rates'], 
+                                 waldoprinter.lang.pack['EEPROM']['PID_Settings'],
+                                 waldoprinter.lang.pack['EEPROM']['Advanced'],
+                                 waldoprinter.lang.pack['EEPROM']['Linear_Advanced'],
+                                 waldoprinter.lang.pack['EEPROM']['Reset']
                                  ]   
         self.load_eeprom()     
 
@@ -110,75 +110,75 @@ class EEPROM(object):
         '''
         self.eeprom_dictionary = {
             
-            roboprinter.lang.pack['EEPROM']['Home_Offset'] : {'name': roboprinter.lang.pack['EEPROM']['Home_Offset'],
+            waldoprinter.lang.pack['EEPROM']['Home_Offset'] : {'name': waldoprinter.lang.pack['EEPROM']['Home_Offset'],
                                                               'command': 'M206',
                                                               'order': ['Z'],
                                                               'range': [10, 0.01, 0.1, 1],
                                                               'values': pconsole.home_offset
                                                              },
 
-            roboprinter.lang.pack['EEPROM']['Probe_Offset'] : {'name': roboprinter.lang.pack['EEPROM']['Probe_Offset'],
+            waldoprinter.lang.pack['EEPROM']['Probe_Offset'] : {'name': waldoprinter.lang.pack['EEPROM']['Probe_Offset'],
                                                                'command': 'M851',
                                                                'order': ['Z'],
                                                                'range': [10, 0.01, 0.1, 1],
                                                                'values': pconsole.probe_offset
                                                               },
 
-            roboprinter.lang.pack['EEPROM']['Feed_Rates']: {'name': roboprinter.lang.pack['EEPROM']['Feed_Rates'],
+            waldoprinter.lang.pack['EEPROM']['Feed_Rates']: {'name': waldoprinter.lang.pack['EEPROM']['Feed_Rates'],
                                                             'command': 'M203',
                                                             'order': ['X', 'Y', 'Z', 'E', 'T0 E', 'T1 E'],
                                                             'range': [0.01, 0.1, 1, 10],
                                                             'values': pconsole.feed_rate
                                                            },
 
-            roboprinter.lang.pack['EEPROM']['PID_Settings'] : { 'name': roboprinter.lang.pack['EEPROM']['PID_Settings'],
+            waldoprinter.lang.pack['EEPROM']['PID_Settings'] : { 'name': waldoprinter.lang.pack['EEPROM']['PID_Settings'],
                                                                 'command': 'M301',
                                                                 'order' : ['P', 'I', 'D'],
                                                                 'range' : [0.01, 0.1, 1, 10],
                                                                 'values': pconsole.PID
                                                               },
 
-            roboprinter.lang.pack['EEPROM']['Bed_PID']: { 'name': roboprinter.lang.pack['EEPROM']['Bed_PID'],
+            waldoprinter.lang.pack['EEPROM']['Bed_PID']: { 'name': waldoprinter.lang.pack['EEPROM']['Bed_PID'],
                                                           'command': 'M304',
                                                           'order' : ['P', 'I', 'D'],
                                                           'range' : [0.01, 0.1, 1, 10],
                                                           'values': pconsole.BPID
                                                         },
 
-            roboprinter.lang.pack['EEPROM']['Steps_Unit'] : { 'name': roboprinter.lang.pack['EEPROM']['Steps_Unit'],
+            waldoprinter.lang.pack['EEPROM']['Steps_Unit'] : { 'name': waldoprinter.lang.pack['EEPROM']['Steps_Unit'],
                                                               'command': 'M92',
                                                               'order': ['X', 'Y', 'Z', 'E', 'T0 E', 'T1 E'],
                                                               'range': [0.01, 0.1, 1, 10],
                                                               'values': pconsole.steps_per_unit
                                                             },
 
-            roboprinter.lang.pack['EEPROM']['Accelerations'] : { 'name': roboprinter.lang.pack['EEPROM']['Accelerations'],
+            waldoprinter.lang.pack['EEPROM']['Accelerations'] : { 'name': waldoprinter.lang.pack['EEPROM']['Accelerations'],
                                                                  'command': 'M204',
                                                                  'order': ['P', 'R', 'T'],
                                                                  'range': [0.01, 0.1, 1, 10, 100, 1000],
                                                                  'values': pconsole.accelerations
                                                                },
 
-            roboprinter.lang.pack['EEPROM']['Max_Accelerations'] : { 'name': roboprinter.lang.pack['EEPROM']['Max_Accelerations'],
+            waldoprinter.lang.pack['EEPROM']['Max_Accelerations'] : { 'name': waldoprinter.lang.pack['EEPROM']['Max_Accelerations'],
                                                                      'command': 'M201',
                                                                      'order': ['X', 'Y', 'Z', 'E', 'T0 E', 'T1 E'],
                                                                      'range': [0.01, 0.1, 1, 10, 100, 1000],
                                                                      'values': pconsole.max_accelerations
                                                                     },
 
-            roboprinter.lang.pack['EEPROM']['Advanced']: { 'name': roboprinter.lang.pack['EEPROM']['Advanced'],
+            waldoprinter.lang.pack['EEPROM']['Advanced']: { 'name': waldoprinter.lang.pack['EEPROM']['Advanced'],
                                                            'command': 'M205',
                                                            'order': ['S', 'T', 'X', 'Y', 'Z', 'E'],
                                                            'range': [0.01, 0.1, 1, 10, 100],
                                                            'values': pconsole.advanced_variables
                                                          },
-            roboprinter.lang.pack['EEPROM']['Linear_Advanced']: { 'name': roboprinter.lang.pack['EEPROM']['Linear_Advanced'],
+            waldoprinter.lang.pack['EEPROM']['Linear_Advanced']: { 'name': waldoprinter.lang.pack['EEPROM']['Linear_Advanced'],
                                                                   'command': 'M900',
                                                                   'order': ['K','R'],
                                                                   'range': [0.01, 0.1, 1, 10, 100],
                                                                   'values': pconsole.linear_advanced
                                                          },
-            roboprinter.lang.pack['EEPROM']['Reset']: { 'name': roboprinter.lang.pack['EEPROM']['Reset'],
+            waldoprinter.lang.pack['EEPROM']['Reset']: { 'name': waldoprinter.lang.pack['EEPROM']['Reset'],
                                                         'action': self.reset_defaults,
                                                         'values': ''
 
@@ -208,40 +208,40 @@ class EEPROM(object):
     def reset_defaults(self):
 
         #get the current screen
-        back_screen = roboprinter.robosm.current
+        back_screen = waldoprinter.waldosm.current
 
         def reset():
-            roboprinter.printer_instance._printer.commands("M502")
-            roboprinter.printer_instance._printer.commands("M500")
-            roboprinter.printer_instance._printer.commands("M501")
+            waldoprinter.printer_instance._printer.commands("M502")
+            waldoprinter.printer_instance._printer.commands("M500")
+            waldoprinter.printer_instance._printer.commands("M501")
 
             #make screen to say that the variables have been reset
 
-            #body_text, button_function, button_text = roboprinter.lang.pack['Button_Screen']['Default_Button']
-            content = Button_Screen(roboprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Body_Text'],
-                                    roboprinter.robosm.go_back_to_main,
-                                    button_text = roboprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Button'])
+            #body_text, button_function, button_text = waldoprinter.lang.pack['Button_Screen']['Default_Button']
+            content = Button_Screen(waldoprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Body_Text'],
+                                    waldoprinter.waldosm.go_back_to_main,
+                                    button_text = waldoprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Button'])
 
             #make screen
-            roboprinter.robosm._generate_backbutton_screen(name='ack_reset_eeprom', 
-                                                           title = roboprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Title'] , 
+            waldoprinter.waldosm._generate_backbutton_screen(name='ack_reset_eeprom', 
+                                                           title = waldoprinter.lang.pack['EEPROM']['Acknowledge_Reset']['Title'] , 
                                                            back_destination=back_screen, 
                                                            content=content)
 
         def cancel():
-            roboprinter.robosm.current = back_screen
+            waldoprinter.waldosm.current = back_screen
 
         #make the confirmation screen
         #body_text, option1_text, option2_text, option1_function, option2_function
-        content = Modal_Question_No_Title(roboprinter.lang.pack['EEPROM']['Reset_Confirmation']['Body_Text'],
-                                          roboprinter.lang.pack['EEPROM']['Reset_Confirmation']['positive'],
-                                          roboprinter.lang.pack['EEPROM']['Reset_Confirmation']['negative'],
+        content = Modal_Question_No_Title(waldoprinter.lang.pack['EEPROM']['Reset_Confirmation']['Body_Text'],
+                                          waldoprinter.lang.pack['EEPROM']['Reset_Confirmation']['positive'],
+                                          waldoprinter.lang.pack['EEPROM']['Reset_Confirmation']['negative'],
                                           reset,
                                           cancel) 
 
         #make screen
-        roboprinter.robosm._generate_backbutton_screen(name='reset_eeprom', 
-                                                       title = roboprinter.lang.pack['EEPROM']['Reset_Confirmation']['Title'] , 
+        waldoprinter.waldosm._generate_backbutton_screen(name='reset_eeprom', 
+                                                       title = waldoprinter.lang.pack['EEPROM']['Reset_Confirmation']['Title'] , 
                                                        back_destination=back_screen, 
                                                        content=content)
 

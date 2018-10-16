@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-09 11:47:59
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 15:21:30
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:21:30
 
 #kivy
 from kivy.uix.button import Button
@@ -20,14 +20,14 @@ from functools import partial
 import copy
 import gc
 
-#Robolcd
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
-from RoboLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector, Wizard_Screen_Controls
-from RoboLCD.lcd.Language import lang
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
+from WaldoLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector, Wizard_Screen_Controls
+from WaldoLCD.lcd.Language import lang
 from filament_workflow import Filament_Workflow
-from RoboLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
+from WaldoLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
 
 class FilamentWizard(object):
 
@@ -49,13 +49,13 @@ class FilamentWizard(object):
         self.dual = False
         self.state = state
         self.selected_tool = 'tool0'
-        current_data = roboprinter.printer_instance._printer.get_current_data()
+        current_data = waldoprinter.printer_instance._printer.get_current_data()
         self.is_printing = current_data['state']['flags']['printing']
         self.is_paused = current_data['state']['flags']['paused']
 
         #add bb
-        roboprinter.robosm.add_widget(self.bb)
-        roboprinter.robosm.current = self.bb.name
+        waldoprinter.waldosm.add_widget(self.bb)
+        waldoprinter.waldosm.current = self.bb.name
 
         # Check debug state, if true, print out instances of FilamentWizard
         #  recognized by the garbage collector
@@ -78,7 +78,7 @@ class FilamentWizard(object):
     def cleanup(self):
         Logger.info("Deleting: filament_wizard")
         #Clean up the wizard
-        roboprinter.robosm.remove_widget(self.bb)
+        waldoprinter.waldosm.remove_widget(self.bb)
         self.bb.delete_node()
 
         if self.welcome != None:
@@ -132,7 +132,7 @@ class FilamentWizard(object):
     def choose_material(self, *args):
         #if we are printing we want to change the material at the current temperature
         if self.is_printing or self.is_paused:
-            temps  = roboprinter.printer_instance._printer.get_current_temperatures()
+            temps  = waldoprinter.printer_instance._printer.get_current_temperatures()
             current_temperature = [0,0]
             extruder = self.selected_tool
 
@@ -146,7 +146,7 @@ class FilamentWizard(object):
             # self.ph_overseer = Preheat_Overseer(end_point=self.collect_heat_settings,
             self.ph_overseer = Preheat_Overseer(end_point=self.collect_heat_settings,
                              name='preheat_wizard',
-                             title=roboprinter.lang.pack['Utilities']['Preheat'],
+                             title=waldoprinter.lang.pack['Utilities']['Preheat'],
                              back_destination=self.bb.name,
                              dual = self.dual,
                              back_button_screen = self.bb,
@@ -202,12 +202,12 @@ class FilamentWizard(object):
                                                  lang.pack['Filament_Wizard']["Ok"])
 
         if self.load_or_change == 'CHANGE':
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_55']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_55']
 
         else:
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_44']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_44']
 
-        back_destination = roboprinter.robo_screen()
+        back_destination = waldoprinter.waldo_screen()
         self.bb.make_screen(layout,
                          _title,
                          option_function='no_option')
@@ -215,4 +215,4 @@ class FilamentWizard(object):
     def goto_main(self):
         Logger.info("Going to main " + str(self))
         self.cleanup()
-        roboprinter.robosm.go_back_to_main()
+        waldoprinter.waldosm.go_back_to_main()

@@ -15,7 +15,7 @@ There are 2 templates below: 'Bug Report' and 'Feature Request'. Use the one whi
 ### What happened instead?
 
 
-### What version of RoboOS are you using?
+### What version of WaldoOS are you using?
 
 
 ### Link copy of octoprint.log or paste raw lines:

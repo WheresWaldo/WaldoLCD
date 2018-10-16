@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-05 10:47:32
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 14:57:35
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 14:57:35
 
 #kivy
 from kivy.uix.button import Button
@@ -14,17 +14,17 @@ from kivy.uix.widget import Widget
 from kivy.logger import Logger
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.connection_popup import Info_Popup, Error_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.connection_popup import Info_Popup, Error_Popup
 
-from RoboLCD.lcd.wizards.preheat_wizard.preheat_buttons import Preheat_Button, Simple_Button
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_buttons import Preheat_Button, Simple_Button
 
 #Python
 from functools import partial
@@ -35,7 +35,7 @@ import gc
 class Preheat(Scroll_Box_Even):
     dual = False
     def __init__(self,callback, dual = False, **kwargs):
-        self.model = roboprinter.printer_instance._settings.get(['Model'])
+        self.model = waldoprinter.printer_instance._settings.get(['Model'])
         self.dual = dual
         self.callback = callback
         self.make_buttons()
@@ -62,12 +62,12 @@ class Preheat(Scroll_Box_Even):
         self.buttons = []
 
         if self.dual:
-            preheat_settings = roboprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
+            preheat_settings = waldoprinter.printer_instance._settings.get(['Dual_Temp_Preset'])
             ordered_presets = self.get_ordered_presets(preheat_settings)
             self.make_dual_extruder_buttons(ordered_presets, preheat_settings)
 
         else:
-            preheat_settings = roboprinter.printer_instance._settings.get(['Temp_Preset'])
+            preheat_settings = waldoprinter.printer_instance._settings.get(['Temp_Preset'])
             ordered_presets = self.get_ordered_presets(preheat_settings)
             self.make_single_extruder_buttons(ordered_presets, preheat_settings)
 

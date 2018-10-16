@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-31 13:02:40
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-27 19:12:12
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 19:12:12
+
 import octoprint.printer
-from RoboLCD import roboprinter
+from WaldoLCD import waldoprinter
 import time
 from kivy.clock import Clock
 from kivy.logger import Logger
@@ -16,7 +17,7 @@ class Console_Watcher(octoprint.printer.PrinterCallback, object):
 
         #register the observer with octoprint
         Logger.info("Registering Console Watcher")
-        roboprinter.printer_instance._printer.register_callback(self)
+        waldoprinter.printer_instance._printer.register_callback(self)
         
     def __del__(self):
         Logger.info("Deleting Console Watcher through __del__!")
@@ -34,4 +35,4 @@ class Console_Watcher(octoprint.printer.PrinterCallback, object):
             self.callback()
         else:
             Logger.info("Callback is not callable!")
-        roboprinter.printer_instance._printer.unregister_callback(self)
+        waldoprinter.printer_instance._printer.unregister_callback(self)

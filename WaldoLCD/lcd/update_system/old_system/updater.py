@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-07-14 12:42:48
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-10 12:15:34
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 12:15:34
 # coding=utf-8
 
 #kivy
@@ -20,27 +20,27 @@ from git import Repo
 from functools import partial
 from shutil import rmtree
 
-#roboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
 
 
 
 class UpdateScreen(FloatLayout):
-    installed_version = StringProperty(roboprinter.lang.pack['Update_Printer']['Checking'])
-    avail_version = StringProperty(roboprinter.lang.pack['Update_Printer']['Checking'])
+    installed_version = StringProperty(waldoprinter.lang.pack['Update_Printer']['Checking'])
+    avail_version = StringProperty(waldoprinter.lang.pack['Update_Printer']['Checking'])
 
     def __init__(self, populate=True, **kwargs):
         super(UpdateScreen, self).__init__()
 
-        self.data_path = roboprinter.printer_instance.get_plugin_data_folder()
-        self.repo_info_url = 'https://api.github.com/repos/robo3d/Update_Script/releases'
+        self.data_path = waldoprinter.printer_instance.get_plugin_data_folder()
+        self.repo_info_url = 'https://api.github.com/repos/WheresWaldo/Update_Script/releases'
         self.repo_local_path = self.data_path + '/Update_Script'
         self.updater_path = self.repo_local_path + '/Update_Checker/Update_Checker.py'
-        self.repo_remote_path = 'https://github.com/Robo3d/Update_Script.git'
-        self.versioning_path = self.data_path + '/roboOS.txt'
+        self.repo_remote_path = 'https://github.com/WheresWaldo/Update_Script.git'
+        self.versioning_path = self.data_path + '/waldoOS.txt'
 
-        self.printer_model = roboprinter.printer_instance._settings.get(['Model'])
+        self.printer_model = waldoprinter.printer_instance._settings.get(['Model'])
 
         #populate version numbers when screen gets initiated
         self.populate = populate
@@ -52,7 +52,7 @@ class UpdateScreen(FloatLayout):
         self.refresh_button()
 
     def refresh_button(self, *args):
-        if self.installed_version < self.avail_version and self.avail_version != roboprinter.lang.pack['Update_Printer']['Connection_Error']:
+        if self.installed_version < self.avail_version and self.avail_version != waldoprinter.lang.pack['Update_Printer']['Connection_Error']:
             self.enable_me()
         else:
             self.disable_me()
@@ -61,8 +61,8 @@ class UpdateScreen(FloatLayout):
         """populates self.installed_version && self.avail_version: values are rendered on the UpdateScreen."""
         self.installed_version = self.get_installed_version()
         self.avail_version = self.get_avail_version()
-        if self.avail_version == roboprinter.lang.pack['Update_Printer']['Connection_Error'] and self.populate:
-            Error_Popup(roboprinter.lang.pack['Update_Printer']['Connect_Error']['Title'], roboprinter.lang.pack['Update_Printer']['Connect_Error']['Body'],callback=partial(roboprinter.robosm.go_back_to_main, tab='printer_status_tab')).show()
+        if self.avail_version == waldoprinter.lang.pack['Update_Printer']['Connection_Error'] and self.populate:
+            Error_Popup(waldoprinter.lang.pack['Update_Printer']['Connect_Error']['Title'], waldoprinter.lang.pack['Update_Printer']['Connect_Error']['Body'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab')).show()
 
     def get_installed_version(self):
         path = self.versioning_path
@@ -86,7 +86,7 @@ class UpdateScreen(FloatLayout):
         if r and code is 200:
             return self._get_avail_version(r.json())
         else:
-            return roboprinter.lang.pack['Update_Printer']['Connection_Error']
+            return waldoprinter.lang.pack['Update_Printer']['Connection_Error']
 
     def _get_avail_version(self, r):
         # parse json response for latest release version
@@ -113,7 +113,7 @@ class UpdateScreen(FloatLayout):
 
     def run_updater(self, *args):
         self.disable_me()
-        self.warning = Warning_Popup(roboprinter.lang.pack['Update_Printer']['Loading']['Title'], roboprinter.lang.pack['Update_Printer']['Loading']['Body'])
+        self.warning = Warning_Popup(waldoprinter.lang.pack['Update_Printer']['Loading']['Title'], waldoprinter.lang.pack['Update_Printer']['Loading']['Body'])
         self.warning.show()
         execute = lambda funcs, dt: map(lambda f: f(), funcs)
         series = [self.update_updater, self._run_updater]
@@ -150,7 +150,7 @@ class UpdateScreen(FloatLayout):
             p.join()
             self.populate_values()
             self.warning.dismiss()
-            Error_Popup(roboprinter.lang.pack['Update_Printer']['No_Update']['Title'], roboprinter.lang.pack['Update_Printer']['No_Update']['Body'],callback=partial(roboprinter.robosm.go_back_to_main, tab='printer_status_tab')).show()
+            Error_Popup(waldoprinter.lang.pack['Update_Printer']['No_Update']['Title'], waldoprinter.lang.pack['Update_Printer']['No_Update']['Body'],callback=partial(waldoprinter.waldosm.go_back_to_main, tab='printer_status_tab')).show()
 
     def disable_me(self):
         self.ids.updatebtn.disabled = True

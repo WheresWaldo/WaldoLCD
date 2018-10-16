@@ -1,8 +1,8 @@
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even 
-from RoboLCD.lcd.update_system.Update_Interface import Update_Interface
-from RoboLCD import roboprinter
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title
-from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even 
+from WaldoLCD.lcd.update_system.Update_Interface import Update_Interface
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title
+from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
 
 #kivy
 from kivy.uix.boxlayout import BoxLayout
@@ -21,7 +21,7 @@ class Update_System(Scroll_Box_Even):
         self.buttons = self.make_buttons()        
         super(Update_System, self).__init__(self.buttons)
         if self.buttons == []:
-            ep = Error_Popup(roboprinter.lang.pack['Update_Printer']['Server_Error']['Title'], roboprinter.lang.pack['Update_Printer']['Server_Error']['Body'])
+            ep = Error_Popup(waldoprinter.lang.pack['Update_Printer']['Server_Error']['Title'], waldoprinter.lang.pack['Update_Printer']['Server_Error']['Body'])
             ep.show()
 
     def make_buttons(self):
@@ -69,7 +69,7 @@ class Install_Button(BoxLayout):
 
     def button_function(self):
         #get the current screen to go back to 
-        back_destination = roboprinter.robosm.current
+        back_destination = waldoprinter.waldosm.current
 
         #this function starts the update
         def goto_update(dt):
@@ -77,25 +77,25 @@ class Install_Button(BoxLayout):
             if not self.update_interface.select_update(self.button_data):
                 #if the update does not go through then throw an error and tell the user
                 self.warning.dismiss()
-                ep = Error_Popup(roboprinter.lang.pack['Update_Printer']['Server_Error']['Title'], roboprinter.lang.pack['Update_Printer']['Server_Error']['Body'], cancel)
+                ep = Error_Popup(waldoprinter.lang.pack['Update_Printer']['Server_Error']['Title'], waldoprinter.lang.pack['Update_Printer']['Server_Error']['Body'], cancel)
                 ep.show()
 
         #this function displays a loading screen so the user knows that the update is loading and nothing is frozen
         def loading_popup():
-            self.warning = Warning_Popup(roboprinter.lang.pack['Update_Printer']['Loading']['Title'], roboprinter.lang.pack['Update_Printer']['Loading']['Body'])
+            self.warning = Warning_Popup(waldoprinter.lang.pack['Update_Printer']['Loading']['Title'], waldoprinter.lang.pack['Update_Printer']['Loading']['Body'])
             self.warning.show()
 
             Clock.schedule_once(goto_update, 0.2)
 
         #this goes back to the last screen
         def cancel(*args, **kwargs):
-            roboprinter.robosm.current = back_destination
+            waldoprinter.waldosm.current = back_destination
 
         #this created the modal screen for confirming that you want to update
         def update_warning():
-            body_text = roboprinter.lang.pack['Update_Printer']['Update_Warning']['Body']
-            option1 = roboprinter.lang.pack['Update_Printer']['Update_Warning']['Option1']
-            option2 = roboprinter.lang.pack['Update_Printer']['Update_Warning']['Option2']
+            body_text = waldoprinter.lang.pack['Update_Printer']['Update_Warning']['Body']
+            option1 = waldoprinter.lang.pack['Update_Printer']['Update_Warning']['Option1']
+            option2 = waldoprinter.lang.pack['Update_Printer']['Update_Warning']['Option2']
             modal_screen = Modal_Question_No_Title(body_text, 
                                                    option1, 
                                                    option2, 
@@ -103,9 +103,9 @@ class Install_Button(BoxLayout):
                                                    cancel
                                                    )
             name = 'update'
-            title = roboprinter.lang.pack['Update_Printer']['Update_Warning']['Title']
+            title = waldoprinter.lang.pack['Update_Printer']['Update_Warning']['Title']
             
-            roboprinter.back_screen(name=name,
+            waldoprinter.back_screen(name=name,
                                     title=title,
                                     back_destination=back_destination,
                                     content=modal_screen

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-11-20 12:45:05
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 14:54:20
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 14:54:20
 
 #kivy
 from kivy.uix.boxlayout import BoxLayout
@@ -10,12 +10,12 @@ from kivy.logger import Logger
 from kivy.clock import Clock
 from kivy.properties import StringProperty, NumericProperty
 
-#RoboLCD
-from RoboLCD.lcd.common_screens import Wizard_Screen_Controls
+#WaldoLCD
+from WaldoLCD.lcd.common_screens import Wizard_Screen_Controls
 from pid_watcher import PID_Watcher
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.Language import lang
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.Language import lang
 
 #python
 import gc
@@ -50,7 +50,7 @@ class PID_Test_Screen(BoxLayout, Wizard_Screen_Controls):
             self.selected_heater = lang.pack['PID_Tool']['Workflow']['Extruder2']
 
         #If there is only one extruder and the extruder is selected call it extruder.
-        profile = roboprinter.printer_instance._settings.global_get(['printerProfiles', 'defaultProfile'])
+        profile = waldoprinter.printer_instance._settings.global_get(['printerProfiles', 'defaultProfile'])
         if 'extruder' in profile:
             extruder_count = int(profile['extruder']['count'])
         else:
@@ -149,7 +149,7 @@ class PID_Test_Screen(BoxLayout, Wizard_Screen_Controls):
             self.failure_callback()
 
     def monitor_temperature(self, *args, **kwargs):
-        temps = roboprinter.printer_instance._printer.get_current_temperatures()
+        temps = waldoprinter.printer_instance._printer.get_current_temperatures()
 
         selected_tool = ''
 

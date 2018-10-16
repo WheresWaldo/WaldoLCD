@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-05 12:25:38
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2017-10-27 13:23:28
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 13:23:28
 # -*- coding: utf-8 -*-
 
 #kivy
@@ -16,15 +16,15 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.logger import Logger
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
-from RoboLCD.lcd.session_saver import session_saver
-from RoboLCD.lcd.connection_popup import Info_Popup, Error_Popup
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.common_screens import Modal_Question_No_Title, KeyboardInput, Keypad, Extruder_Selector
+from WaldoLCD.lcd.session_saver import session_saver
+from WaldoLCD.lcd.connection_popup import Info_Popup, Error_Popup
 
 #Python
 from functools import partial

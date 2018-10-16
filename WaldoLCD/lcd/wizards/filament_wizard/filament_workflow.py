@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-12 10:18:47
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 14:56:47
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 14:56:47
 
 #kivy
 from kivy.properties import StringProperty, NumericProperty
@@ -12,13 +12,13 @@ from kivy.clock import Clock
 #python
 from functools import partial
 
-#Robolcd
-from RoboLCD import roboprinter
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
-from RoboLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen
-from RoboLCD.lcd.Language import lang
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
+from WaldoLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen
+from WaldoLCD.lcd.Language import lang
 
 class Filament_Workflow(object):
     """
@@ -31,7 +31,7 @@ class Filament_Workflow(object):
         self.bb = back_button_screen
         self.name = ext_name + "_" + mode
         #check if the printer is printing
-        current_data = roboprinter.printer_instance._printer.get_current_data()
+        current_data = waldoprinter.printer_instance._printer.get_current_data()
         self.is_printing = current_data['state']['flags']['printing']
         self.is_paused = current_data['state']['flags']['paused']
         self.tmp_event = None
@@ -88,9 +88,9 @@ class Filament_Workflow(object):
 
 
         if self.mode == 'CHANGE':
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_15']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_15']
         else:
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_14']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_14']
 
         self.temp_screen = Temperature_Wait_Screen(self.destination_selector, tool_select=self.ext_name )
         self.temp_screen.change_screen_actions = self.change_screen_event_override
@@ -136,7 +136,7 @@ class Filament_Workflow(object):
                                            button_text=lang.pack['Filament_Wizard']['Next'])
 
         self.bb.make_screen(layout,
-                         roboprinter.lang.pack['Filament_Wizard']['Title_25'],
+                         waldoprinter.lang.pack['Filament_Wizard']['Title_25'],
                          option_function='no_option')
 
         #end the event before starting it again
@@ -155,10 +155,10 @@ class Filament_Workflow(object):
         """
 
         if self.mode == 'CHANGE':
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_35']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_35']
             back_dest = self.name+'[2]'
         else:
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_24']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_24']
             back_dest = self.name
 
         if self.extrude_event != None:
@@ -182,10 +182,10 @@ class Filament_Workflow(object):
             Display button that will move_to_main() AND stop extruding filament
         """
         if self.mode == 'CHANGE':
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_45']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_45']
             back_dest = self.name+'[3]'
         else:
-            _title = roboprinter.lang.pack['Filament_Wizard']['Title_34']
+            _title = waldoprinter.lang.pack['Filament_Wizard']['Title_34']
             back_dest = self.name+'[3]'
 
         #body_text,image_source, button_function, button_image, button_text
@@ -207,7 +207,7 @@ class Filament_Workflow(object):
 
     def extrude(self, *args):
         #Title_34 and Title 45 are the same thing, but this protects against any different languages besides english in which they may be different.
-        if self.bb.title == roboprinter.lang.pack['Filament_Wizard']['Title_45'] or self.bb.title == roboprinter.lang.pack['Filament_Wizard']['Title_34']:
+        if self.bb.title == waldoprinter.lang.pack['Filament_Wizard']['Title_45'] or self.bb.title == waldoprinter.lang.pack['Filament_Wizard']['Title_34']:
 
             if self.extruder_control.selected_tool == 'tool0':
                 self.extruder_control.extrude(5.0)
@@ -221,7 +221,7 @@ class Filament_Workflow(object):
             return False
 
     def retract(self, *args):
-        if self.bb.title == roboprinter.lang.pack['Filament_Wizard']['Title_25']:
+        if self.bb.title == waldoprinter.lang.pack['Filament_Wizard']['Title_25']:
             if self.extruder_control.selected_tool == 'tool0':
                 self.extruder_control.extrude(-5.0)
             elif self.extruder_control.selected_tool == 'tool1':
@@ -263,7 +263,7 @@ class Extruder_Control(object):
     E_Position = None #position saver for the Extruder E Position
     def __init__(self, selected_tool = 'tool0'):
         super(Extruder_Control, self).__init__()
-        self.controls = roboprinter.printer_instance._printer
+        self.controls = waldoprinter.printer_instance._printer
         self.change_tool(selected_tool)
 
 

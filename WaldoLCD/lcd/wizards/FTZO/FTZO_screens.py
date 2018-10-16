@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-27 13:07:21
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 14:51:55
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 14:51:55
 
 #kivy
 from kivy.uix.boxlayout import BoxLayout
@@ -15,14 +15,14 @@ from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Even_Button
-from RoboLCD.lcd.common_screens import Button_Screen, Temperature_Wait_Screen, Modal_Question, Picture_Button_Screen, Extruder_Selector
-from RoboLCD.lcd.wizards.FTZO.circle_plotter import circle_plotter
-from RoboLCD.lcd.wizards.FTZO.console_watcher import Console_Watcher
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.scrollbox import Scroll_Box_Even, Scroll_Box_Even_Button
+from WaldoLCD.lcd.common_screens import Button_Screen, Temperature_Wait_Screen, Modal_Question, Picture_Button_Screen, Extruder_Selector
+from WaldoLCD.lcd.wizards.FTZO.circle_plotter import circle_plotter
+from WaldoLCD.lcd.wizards.FTZO.console_watcher import Console_Watcher
 
 #python
 import math
@@ -43,7 +43,7 @@ class Update_Offset(BoxLayout, object):
     cw = None
 
     #this variable is used by parent class
-    title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title']
+    title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title']
 
     
     def __init__(self, mode, back_button):
@@ -110,7 +110,7 @@ class Update_Offset(BoxLayout, object):
     def set_offset(self):
         updated_offset = self.actual_offset + self.offset
         #take a big float and reduce it to two numbers, then save the new offset
-        roboprinter.printer_instance._printer.commands('M206 Z{0:.2f} '.format(updated_offset))
+        waldoprinter.printer_instance._printer.commands('M206 Z{0:.2f} '.format(updated_offset))
         self.actual_offset = updated_offset
         self.offset = 0
         self.make_shape()
@@ -153,12 +153,12 @@ class Update_Offset(BoxLayout, object):
     def _line(self):
         #start a console watcher
         Console_Watcher(self.unlock)
-        roboprinter.printer_instance._printer.commands('G1 Z0.3') #put nozzle on the bed
-        roboprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can make a line
-        roboprinter.printer_instance._printer.commands('G1 E6.00 F1000') #extrude filament
-        roboprinter.printer_instance._printer.commands('G1 Y' + str(self.travel_amount) + ' E15.00 F1000') #make a line ratio is 12mm on bed to 1mm extrude for R2
-        roboprinter.printer_instance._printer.commands('G1 Z5 E10.00 F1000') #Retract filament and pull nozzle off bed    
-        roboprinter.printer_instance._printer.commands("M114")
+        waldoprinter.printer_instance._printer.commands('G1 Z0.3') #put nozzle on the bed
+        waldoprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can make a line
+        waldoprinter.printer_instance._printer.commands('G1 E6.00 F1000') #extrude filament
+        waldoprinter.printer_instance._printer.commands('G1 Y' + str(self.travel_amount) + ' E15.00 F1000') #make a line ratio is 12mm on bed to 1mm extrude for R2
+        waldoprinter.printer_instance._printer.commands('G1 Z5 E10.00 F1000') #Retract filament and pull nozzle off bed    
+        waldoprinter.printer_instance._printer.commands("M114")
         Logger.info("self.x_pos is at: "  + str(self.x_pos))  
 
         #add or subtract based on mode
@@ -171,9 +171,9 @@ class Update_Offset(BoxLayout, object):
 
         Logger.info("self.x_pos is at: "  + str(self.x_pos))
         #Goto next point
-        roboprinter.printer_instance._printer.commands('G1 X'+ str(self.x_pos) + ' Y'+ str(self.start_pos_y) + ' F3000') #go to the next line start position
-        roboprinter.printer_instance._printer.commands("M114") #Make the serial console busy until the move command has completed
-        roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') #Tell the console watcher that the action is complete
+        waldoprinter.printer_instance._printer.commands('G1 X'+ str(self.x_pos) + ' Y'+ str(self.start_pos_y) + ' F3000') #go to the next line start position
+        waldoprinter.printer_instance._printer.commands("M114") #Make the serial console busy until the move command has completed
+        waldoprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') #Tell the console watcher that the action is complete
 
 
     def _circle(self):
@@ -188,17 +188,17 @@ class Update_Offset(BoxLayout, object):
         Logger.info("Circle has " + str(len(circle['script'])) + " Points")
 
         #print circle
-        roboprinter.printer_instance._printer.commands('G1 X' + str(circle['start_point'][0]) + " Y" + str(circle['start_point'][1]) + " F3000")
-        roboprinter.printer_instance._printer.commands('G1 Z0.3') #put nozzle on the bed
-        roboprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can prime the head
-        roboprinter.printer_instance._printer.commands('G1 E5.20 F500') #extrude filament
-        roboprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can make a circle
+        waldoprinter.printer_instance._printer.commands('G1 X' + str(circle['start_point'][0]) + " Y" + str(circle['start_point'][1]) + " F3000")
+        waldoprinter.printer_instance._printer.commands('G1 Z0.3') #put nozzle on the bed
+        waldoprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can prime the head
+        waldoprinter.printer_instance._printer.commands('G1 E5.20 F500') #extrude filament
+        waldoprinter.printer_instance._printer.commands('G92 E0.00') #reset the E to zero so we can make a circle
         #make the circle
-        roboprinter.printer_instance._printer.commands(circle['script']) #print coordinate of circle
+        waldoprinter.printer_instance._printer.commands(circle['script']) #print coordinate of circle
 
         #lift head
-        roboprinter.printer_instance._printer.commands('G1 Z5 E' + str(circle['end_e'] - 5.00) + ' F3000') #Retract filament and pull nozzle off bed 
-        roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') #This command will echo back the text we sent it. Another process will pick this up and call a callback
+        waldoprinter.printer_instance._printer.commands('G1 Z5 E' + str(circle['end_e'] - 5.00) + ' F3000') #Retract filament and pull nozzle off bed 
+        waldoprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!') #This command will echo back the text we sent it. Another process will pick this up and call a callback
 
         #alter self.x_pos
         self.x_pos = self.x_pos - 5
@@ -221,20 +221,20 @@ class Update_Offset(BoxLayout, object):
         #################################################################################################################
                                     #Get off of the endstop so the Z axis works...
         #get bed dimensions
-        bed_x = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
-        bed_y = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
+        bed_x = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
+        bed_y = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
 
         #calculate final positions
         bed_x = float(bed_x) / 2.0
         bed_y = float(bed_y) / 2.0
 
-        roboprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F3000')
+        waldoprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F3000')
         #################################################################################################################
         
-        roboprinter.printer_instance._printer.commands('G1 Z'+ str(drop) + ' F3000')
-        roboprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
-        self.warning_screen = Button_Screen(roboprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Body'] , self.restart)
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Title']
+        waldoprinter.printer_instance._printer.commands('G1 Z'+ str(drop) + ' F3000')
+        waldoprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
+        self.warning_screen = Button_Screen(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Body'] , self.restart)
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Title']
 
         self.bb.make_screen(self.warning_screen,
                             title,
@@ -243,8 +243,8 @@ class Update_Offset(BoxLayout, object):
 
     def restart(self):
         def reposition(dt):
-            roboprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
-            roboprinter.printer_instance._printer.commands('G1 Z5')
+            waldoprinter.printer_instance._printer.commands('G1 X'+ str(self.start_pos_x) + ' Y'+ str(self.start_pos_y) + ' F3000') # go to first corner
+            waldoprinter.printer_instance._printer.commands('G1 Z5')
             self.x_pos = self.start_pos_x
             #update position
             pconsole.get_position()
@@ -252,12 +252,12 @@ class Update_Offset(BoxLayout, object):
     
             self.go_back_to_FTZO()
 
-        self.warning_screen.body_text = roboprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Repositioning']
+        self.warning_screen.body_text = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Repositioning']
         Clock.schedule_once(reposition, 0.2)
 
     #this function will take us back to the FTZO Edit page
     def go_back_to_FTZO(self):
-        self.bb.go_back_to_screen_with_title(roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title'])
+        self.bb.go_back_to_screen_with_title(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title'])
     
 
 
@@ -355,29 +355,29 @@ class FTZO_Options(Scroll_Box_Even):
         self.buttons = []
 
         #put finish wizard first so it's always visible
-        finish_wizard = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Save_and_Exit'], self.finish_wizard, "")
+        finish_wizard = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Save_and_Exit'], self.finish_wizard, "")
         self.buttons.append(finish_wizard)
         if self.mode['corner'] != "CIRCLE":
-            set_mode_button = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Corner'], 
+            set_mode_button = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Corner'], 
                               self.user_set_mode, "")
-            change_to_circle = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Circles'], 
+            change_to_circle = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Circles'], 
                               self.change_shape, "CIRCLE")
             self.buttons.append(set_mode_button)
             self.buttons.append(change_to_circle)
         else:
-            change_to_lines = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Lines'], 
+            change_to_lines = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Lines'], 
                               self.change_shape, "LINES")
             self.buttons.append(change_to_lines)
             
 
         
         if self.dual:
-            change_extruder = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Extruder'], 
+            change_extruder = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Change_Extruder'], 
                               self.change_extruder, "")
             self.buttons.append(change_extruder)
-        clear_bed = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Clear_Bed'], 
+        clear_bed = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Clear_Bed'], 
                         self.clear_bed, [self.clear_bed_restart, self.go_back_to_FTZO] )
-        #re_calibrate = Scroll_Box_Even_Button(roboprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Recalibrate'], self.re_calibrate_bed, self.go_back_to_FTZO)
+        #re_calibrate = Scroll_Box_Even_Button(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Options']['Recalibrate'], self.re_calibrate_bed, self.go_back_to_FTZO)
         
 
         self.buttons.append(clear_bed)
@@ -398,20 +398,20 @@ class FTZO_Options(Scroll_Box_Even):
         #################################################################################################################
                                     #Get off of the endstop so the Z axis works...
         #get bed dimensions
-        bed_x = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
-        bed_y = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
+        bed_x = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
+        bed_y = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
 
         #calculate final positions
         bed_x = float(bed_x) / 2.0
         bed_y = float(bed_y) / 2.0
 
-        roboprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F3000')
+        waldoprinter.printer_instance._printer.commands('G1 X' + str(bed_x) + ' Y' + str(bed_y) +' F3000')
         #################################################################################################################
-        roboprinter.printer_instance._printer.commands('G1 Z'+ str(drop) + ' F3000')
+        waldoprinter.printer_instance._printer.commands('G1 Z'+ str(drop) + ' F3000')
         from functools import partial
         c = partial(callback[0], callback=callback[1])
-        layout = Button_Screen(roboprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Body'] , c)
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Title']
+        layout = Button_Screen(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Body'] , c)
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Warn_Restart']['Title']
 
         self.bb.make_screen(layout,
                                                 title,
@@ -434,14 +434,14 @@ class FTZO_Options(Scroll_Box_Even):
         else:
             right_corner()
 
-        # layout = Modal_Question(roboprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Sub_Title'] , 
-        #                         roboprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Body'],
-        #                         roboprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Option1'],
-        #                         roboprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Option2'],
+        # layout = Modal_Question(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Sub_Title'] , 
+        #                         waldoprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Body'],
+        #                         waldoprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Option1'],
+        #                         waldoprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Option2'],
         #                         left_corner,
         #                         right_corner
         #                         )
-        # title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Title']
+        # title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Set_Mode']['Title']
 
         # self.bb.make_screen(layout, 
         #                                         title,
@@ -449,9 +449,9 @@ class FTZO_Options(Scroll_Box_Even):
 
     def re_calibrate_bed(self, bed_callback):
         def redo_cal(callback=None):
-            roboprinter.printer_instance._printer.commands('G36')
-            roboprinter.printer_instance._printer.commands('M114')
-            roboprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!')
+            waldoprinter.printer_instance._printer.commands('G36')
+            waldoprinter.printer_instance._printer.commands('M114')
+            waldoprinter.printer_instance._printer.commands('M118 ACTION COMPLETE!')
             self.set_mode(self.mode['corner']) #reset the current mode
             callback()
 
@@ -462,8 +462,8 @@ class FTZO_Options(Scroll_Box_Even):
     def change_shape(self, shape):
         if shape == "CIRCLE":
             self.set_mode("CIRCLE")
-            layout = Button_Screen(roboprinter.lang.pack['FT_ZOffset_Wizard']['Change_Pattern']['Body_Text'], self.go_back_to_FTZO)
-            title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Change_Pattern']['Title']
+            layout = Button_Screen(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Change_Pattern']['Body_Text'], self.go_back_to_FTZO)
+            title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Change_Pattern']['Title']
             self.bb.make_screen(layout,
                                                     title,
                                                     option_function='no_option')
@@ -473,7 +473,7 @@ class FTZO_Options(Scroll_Box_Even):
         
     #this function will take us back to the FTZO Edit page
     def go_back_to_FTZO(self):
-        self.bb.go_back_to_screen_with_title(roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title'])
+        self.bb.go_back_to_screen_with_title(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title'])
 
     def change_extruder(self, *args, **kwargs):
 
@@ -522,10 +522,10 @@ class FTZO_Options(Scroll_Box_Even):
     def save_z_offset(self, *args, **kwargs):
         
         layout = Z_offset_saver(self.go_back_to_FTZO,
-                               [roboprinter.lang.pack['Save_Offset']['Saving'], roboprinter.lang.pack['Save_Offset']['Saved']], 
+                               [waldoprinter.lang.pack['Save_Offset']['Saving'], waldoprinter.lang.pack['Save_Offset']['Saved']], 
                                )
 
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Title']
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Title']
 
         self.bb.make_screen(layout,
                                                 title,
@@ -561,13 +561,13 @@ class Z_offset_saver(Picture_Button_Screen):
             raise ValueError("did not supply the correct array length of correct type values for variable self.title_texts")
 
         title_text = self.title_texts[0]
-        body_text = roboprinter.lang.pack['FT_ZOffset_Wizard']['Save_Offset']['Waiting']
+        body_text = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Save_Offset']['Waiting']
         image_source = self.icons[0]
         button_function = self.okay_button
         self.callback = callback
 
         #save the Z-Offset
-        roboprinter.printer_instance._printer.commands('M500')
+        waldoprinter.printer_instance._printer.commands('M500')
         pconsole.register_observer('M206', self.update_offset)
         Logger.info("querying eeprom")
         pconsole.query_eeprom()
@@ -619,7 +619,7 @@ class Z_offset_saver(Picture_Button_Screen):
         self.updated_offset = self.offset_saver
         self.image_source = self.icons[1]
         self.title_text = self.title_texts[1]
-        self.body_text = roboprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Body'] + str(self.updated_offset)
+        self.body_text = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Body'] + str(self.updated_offset)
             
 
 

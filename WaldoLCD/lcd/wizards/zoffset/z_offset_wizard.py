@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-11 14:54:41
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-02-22 11:48:13
-#kivy
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 11:48:13
+
+#Kivy
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
@@ -14,14 +15,14 @@ from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.common_screens import Picture_Button_Screen, Wait_Screen, Override_Layout,Picture_Button_Screen_Body, Button_Screen, Extruder_Selector
-from RoboLCD.lcd.Language import lang
-from RoboLCD.lcd.wizards.wizard_bb import Wizard_BB
-from RoboLCD.lcd.wizards.zoffset.z_offset_workflow import Z_Offset_Workflow
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.common_screens import Picture_Button_Screen, Wait_Screen, Override_Layout,Picture_Button_Screen_Body, Button_Screen, Extruder_Selector
+from WaldoLCD.lcd.Language import lang
+from WaldoLCD.lcd.wizards.wizard_bb import Wizard_BB
+from WaldoLCD.lcd.wizards.zoffset.z_offset_workflow import Z_Offset_Workflow
 
 #Python
 #import gc
@@ -46,8 +47,8 @@ class ZoffsetWizard(object):
         self.bb = Wizard_BB()
         self.group = 'Z_Offset_Group'
         #add bb
-        roboprinter.robosm.add_widget(self.bb)
-        roboprinter.robosm.current = self.bb.name
+        waldoprinter.waldosm.add_widget(self.bb)
+        waldoprinter.waldosm.current = self.bb.name
 
         self.welcome = None
         self.workflow = None
@@ -65,7 +66,7 @@ class ZoffsetWizard(object):
 
     def cleanup(self):
         Logger.info("Deleting: z_offset_wizard")
-        roboprinter.robosm.remove_widget(self.bb)
+        waldoprinter.waldosm.remove_widget(self.bb)
         self.bb.delete_node()
 
         if self.welcome != None:
@@ -97,7 +98,7 @@ class ZoffsetWizard(object):
         self.welcome.change_screen_actions = self.cleanup
         #populate screen
         self.bb.make_screen(self.welcome,
-                            roboprinter.lang.pack['ZOffset_Wizard']['Welcome'],
+                            waldoprinter.lang.pack['ZOffset_Wizard']['Welcome'],
                             option_function='no_option')
 
     def process_state(self):
@@ -169,9 +170,9 @@ class ZoffsetWizard(object):
 
 
     def finish_wizard(self, *args, **kwargs):
-        title = roboprinter.lang.pack['ZOffset_Wizard']['Z_44']
+        title = waldoprinter.lang.pack['ZOffset_Wizard']['Z_44']
 
-        #title_text, body_text,image_source, button_function, button_text = roboprinter.lang.pack['Button_Screen']['Default_Button']
+        #title_text, body_text,image_source, button_function, button_text = waldoprinter.lang.pack['Button_Screen']['Default_Button']
         self.finish_screen = Picture_Button_Screen('[size=40][color=#69B3E7]' + lang.pack['ZOffset_Wizard']['Finish_Title'] + '[/color][/size]',
                                        '[size=30]' + lang.pack['ZOffset_Wizard']['Finish_Body1'] + ' {} '.format(self.z_offset['tool0']) + lang.pack['ZOffset_Wizard']['Finish_Body2'],
                                        'Icons/Manual_Control/check_icon.png',
@@ -188,16 +189,16 @@ class ZoffsetWizard(object):
     def reset_to_zero_on_back(self):
         #set the ZOffset to zero
         Logger.info("Setting the Z-Offset to 0 due to a back screen!")
-        roboprinter.printer_instance._printer.commands('M206 Z0.00')
-        roboprinter.printer_instance._printer.commands("M851 Z0.00")
-        roboprinter.printer_instance._printer.commands("M500")
-        roboprinter.printer_instance._printer.commands('M114')
+        waldoprinter.printer_instance._printer.commands('M206 Z0.00')
+        waldoprinter.printer_instance._printer.commands("M851 Z0.00")
+        waldoprinter.printer_instance._printer.commands("M500")
+        waldoprinter.printer_instance._printer.commands('M114')
 
     def skip_screen(self):
         self.bb.back_function_flow()
 
     def end_wizard(self):
         #home and go back
-        roboprinter.printer_instance._printer.commands('G28')
+        waldoprinter.printer_instance._printer.commands('G28')
         self.cleanup()
-        roboprinter.robosm.go_back_to_main('printer_status_tab')
+        waldoprinter.waldosm.go_back_to_main('printer_status_tab')

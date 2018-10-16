@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-09-27 15:58:32
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-28 15:00:28
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 15:00:28
 #Kivy
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.logger import Logger
 
-#RoboLCD
-from RoboLCD import roboprinter
+#WaldoLCD
+from WaldoLCD import waldoprinter
 
 
 class File_BB(Screen):
@@ -101,10 +101,10 @@ class File_BB(Screen):
         #     Logger.info("Done Listing Children")
     
     def delete_same_name_screens(self):
-        for s in roboprinter.robosm.screen_names:
+        for s in waldoprinter.waldosm.screen_names:
             if s is self.name:
-                d = roboprinter.robosm.get_screen(s)
-                roboprinter.robosm.remove_widget(d)
+                d = waldoprinter.waldosm.get_screen(s)
+                waldoprinter.waldosm.remove_widget(d)
                 Logger.info("Removed Duplicate Screen: " + s)
 
 

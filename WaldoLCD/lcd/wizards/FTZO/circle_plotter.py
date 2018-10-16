@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-30 16:10:58
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-19 18:07:33
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 18:07:33
 
 #python
 import math
 
-#Robolcd
-from RoboLCD import roboprinter
+#WaldoLCD
+from WaldoLCD import waldoprinter
 
 class circle_plotter(object):
     '''Circle Plotter will get the center of the bed on the current printer and return a GCODE 
@@ -20,8 +20,8 @@ class circle_plotter(object):
 
     def get_bed_center(self):
         #get bed dimensions
-        bed_x = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
-        bed_y = roboprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
+        bed_x = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','width'])
+        bed_y = waldoprinter.printer_instance._settings.global_get(['printerProfiles','defaultProfile', 'volume','depth'])
 
         #calculate final positions (x and y are the center of the print bed)
         self.bed_x = float(bed_x) / 2.0

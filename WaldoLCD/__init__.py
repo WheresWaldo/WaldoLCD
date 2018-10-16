@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Author: Matt Pedler modded by BH
+# @Author: Matt Pedler
 # @Date:   2017-09-29 15:08:31
 # @Last Modified by:   BH
 # @Last Modified time: 2018-10-15 23:59:59
 # coding=utf-8
+
 from __future__ import absolute_import
 import octoprint.plugin
 
@@ -78,7 +79,7 @@ class WaldolcdPlugin(octoprint.plugin.SettingsPlugin,
 
         passing = lang.pack['Load_Success']['pass']
         self._logger.info("Loading Success? " + str(passing) + " ######################################")
-        roboprinter.lang = lang
+        waldoprinter.lang = lang
 
         
 

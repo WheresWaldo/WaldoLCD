@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Matt Pedler
 # @Date:   2017-10-20 14:35:15
-# @Last Modified by:   Matt Pedler
-# @Last Modified time: 2018-01-31 11:35:54
+# @Last Modified by:   BH
+# @Last Modified time: 2018-10-15 11:35:54
 
 #kivy
 from kivy.uix.boxlayout import BoxLayout
@@ -15,17 +15,17 @@ from kivy.logger import Logger
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
 
-#RoboLCD
-from RoboLCD import roboprinter
-from RoboLCD.lcd.printer_jog import printer_jog
-from RoboLCD.lcd.common_screens import Button_Screen, Picture_Button_Screen
-from RoboLCD.lcd.pconsole import pconsole
-from RoboLCD.lcd.connection_popup import Error_Popup, Warning_Popup
-from RoboLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
-from RoboLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
-from RoboLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector
-from RoboLCD.lcd.wizards.FTZO.FTZO_workflow import FTZO_workflow
-from RoboLCD.lcd.wizards.FTZO.FTZO_screens import Picture_Instructions, Z_offset_saver
+#WaldoLCD
+from WaldoLCD import waldoprinter
+from WaldoLCD.lcd.printer_jog import printer_jog
+from WaldoLCD.lcd.common_screens import Button_Screen, Picture_Button_Screen
+from WaldoLCD.lcd.pconsole import pconsole
+from WaldoLCD.lcd.connection_popup import Error_Popup, Warning_Popup
+from WaldoLCD.lcd.wizards.preheat_wizard.preheat_overseer import Preheat_Overseer
+from WaldoLCD.lcd.wizards.wizard_bb import Wizard_BB, Screen_Node
+from WaldoLCD.lcd.common_screens import Image_on_Button_Screen, Picture_Image_on_Button_Screen, Temperature_Wait_Screen, Title_Picture_Image_on_Button_Screen, Extruder_Selector
+from WaldoLCD.lcd.wizards.FTZO.FTZO_workflow import FTZO_workflow
+from WaldoLCD.lcd.wizards.FTZO.FTZO_screens import Picture_Instructions, Z_offset_saver
 
 #python
 from functools import partial
@@ -53,8 +53,8 @@ class Fine_Tune_ZOffset(object):
         self.selected_tool = 'tool0'
 
         #add bb
-        roboprinter.robosm.add_widget(self.bb)
-        roboprinter.robosm.current = self.bb.name
+        waldoprinter.waldosm.add_widget(self.bb)
+        waldoprinter.waldosm.current = self.bb.name
         self.welcome_screen() #start the wizard
 
         #variable that does not get a soft restart
@@ -66,7 +66,7 @@ class Fine_Tune_ZOffset(object):
         #Cleanup the wizard and remove all summoned objects from memory
 
         #remove BB from screen manager object
-        roboprinter.robosm.remove_widget(self.bb)
+        waldoprinter.waldosm.remove_widget(self.bb)
 
         #ask BB to delete all of it's nodes
         self.bb.delete_node()
@@ -111,10 +111,10 @@ class Fine_Tune_ZOffset(object):
 
 
     def welcome_screen(self):
-        self.welcome = Button_Screen(roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Body'],
+        self.welcome = Button_Screen(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Body'],
                                self.process_machine_state,
-                               button_text=roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Button_Text'])
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title']
+                               button_text=waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Button_Text'])
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Welcome']['Title']
         self.welcome.change_screen_actions = self.cleanup
 
         self.bb.make_screen(self.welcome,
@@ -160,7 +160,7 @@ class Fine_Tune_ZOffset(object):
         Logger.info("Making Preheat_Overseer with group: " + str(self.group))
         self.ph_overseer = Preheat_Overseer(end_point=self.collect_heat_settings,
                          name='preheat_wizard',
-                         title=roboprinter.lang.pack['Utilities']['Preheat'],
+                         title=waldoprinter.lang.pack['Utilities']['Preheat'],
                          back_destination=self.bb.name,
                          dual = self.dual,
                          back_button_screen = self.bb,
@@ -173,9 +173,9 @@ class Fine_Tune_ZOffset(object):
         self.instruction1()
 
     def instruction1(self):
-        layout = Button_Screen(roboprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Body'],
+        layout = Button_Screen(waldoprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Body'],
                                self.instruction2)
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Title']
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Title']
 
         self.bb.make_screen(layout,
                             title,
@@ -185,7 +185,7 @@ class Fine_Tune_ZOffset(object):
 
     def instruction2(self):
         layout = Picture_Instructions()
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Title']
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Instruction']['Title']
 
         self.bb.make_screen(layout,
                             title,
@@ -208,22 +208,22 @@ class Fine_Tune_ZOffset(object):
         self.workflow = FTZO_workflow(self.dual, self.selected_tool, temps, self.finish_wizard, self.bb, debug=self.debug_mode)
 
     def finish_wizard(self):
-        roboprinter.printer_instance._printer.commands('M500')
+        waldoprinter.printer_instance._printer.commands('M500')
         offset = pconsole.home_offset['Z']
         self.zo_saver = Z_offset_saver(self.goto_main,
-                                [roboprinter.lang.pack['FT_ZOffset_Wizard']['Save_Offset']['Saving'], roboprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Sub_Title'] ]
+                                [waldoprinter.lang.pack['FT_ZOffset_Wizard']['Save_Offset']['Saving'], waldoprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Sub_Title'] ]
                                 )
-        title = roboprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Title']
+        title = waldoprinter.lang.pack['FT_ZOffset_Wizard']['Finish']['Title']
 
         self.bb.make_screen(self.zo_saver,
                             title,
                             option_function = 'no_option')
 
     def goto_main(self):
-        roboprinter.printer_instance._printer.commands('M104 S0')
-        roboprinter.printer_instance._printer.commands('M140 S0')
-        roboprinter.printer_instance._printer.commands('G28')
-        roboprinter.robosm.go_back_to_main('utilities_tab')
+        waldoprinter.printer_instance._printer.commands('M104 S0')
+        waldoprinter.printer_instance._printer.commands('M140 S0')
+        waldoprinter.printer_instance._printer.commands('G28')
+        waldoprinter.waldosm.go_back_to_main('utilities_tab')
         #cleanup self
         self.cleanup()
         
